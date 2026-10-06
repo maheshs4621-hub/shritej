@@ -112,7 +112,7 @@ export const ShipmentTracker: React.FC<ShipmentTrackerProps> = ({ orders, onBrow
     : '';
 
   const waHref = 'https://wa.me/918080218728?text=' + encodeURIComponent(
-    'Namaste SHRiTEJ AYURVED, Please provide live courier location for Order #' + (searchedOrder?.id || 'STA-') + ' (AWB: ' + awb + ')'
+    'Namaste SHRITEJ AYURVED, Please provide live courier location for Order #' + (searchedOrder?.id || 'STA-') + ' (AWB: ' + awb + ')'
   );
 
   return (

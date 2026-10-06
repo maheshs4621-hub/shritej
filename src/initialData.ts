@@ -3,7 +3,7 @@
 export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 'ubtan-100g',
-    name: 'SHRiTEJ Traditional Ayurvedic Ubtan (100g)',
+    name: 'SHRITEJ Traditional Ayurvedic Ubtan (100g)',
     tagline: 'Pure authentic herbal formulation for naturally glowing & radiant skin',
     price: 299,
     originalPrice: 449,
@@ -14,7 +14,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 85,
     isFeatured: true,
     isNewArrival: true,
-    description: 'Crafted strictly according to time-honoured Ayurvedic wisdom. SHRiTEJ AYURVED Traditional Ayurvedic Ubtan is 100% natural, pure herbal, and free from added synthetic chemicals. Packed with potent botanicals including Manjishta, Chandan, Vetchandan, Lodhra, Nagkesar, Halad, Gulab, and Multani Mitti. Gently purifies pores, reduces sun tan, fades blemishes, and imparts a natural golden luster.',
+    description: 'Crafted strictly according to time-honoured Ayurvedic wisdom. SHRITEJ AYURVED Traditional Ayurvedic Ubtan is 100% natural, pure herbal, and free from added synthetic chemicals. Packed with potent botanicals including Manjishta, Chandan, Vetchandan, Lodhra, Nagkesar, Halad, Gulab, and Multani Mitti. Gently purifies pores, reduces sun tan, fades blemishes, and imparts a natural golden luster.',
     ingredients: 'Manjishta (Rubia cordifolia), Chandan (Santalum album), Vetchandan, Lodhra (Symplocos racemosa), Nagkesar (Mesua ferrea), Multani Mitti (Fuller\'s Earth), Halad (Curcuma longa), Gulab Petal Powder (Rosa damascena).',
     ayurvedicBenefits: [
       'Traditionally valued for calming Pitta and Kapha skin imbalances',
@@ -22,7 +22,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       'Supports healthy skin cell renewal and reversal of tanning',
       'Imparts a natural golden Ayurvedic complexion (Varnya)'
     ],
-    howToUse: 'Take 1 to 2 teaspoons in a brass or ceramic bowl. Mix with SHRiTEJ Pure Kannauj Rose Water (for oily/normal skin) or raw organic milk/curd (for dry skin) to form a smooth paste. Apply evenly over face and neck. Leave for 12-15 minutes until semi-dry. Rinse with cool water in gentle circular motions.',
+    howToUse: 'Take 1 to 2 teaspoons in a brass or ceramic bowl. Mix with SHRITEJ Pure Kannauj Rose Water (for oily/normal skin) or raw organic milk/curd (for dry skin) to form a smooth paste. Apply evenly over face and neck. Leave for 12-15 minutes until semi-dry. Rinse with cool water in gentle circular motions.',
     suitableFor: 'All skin types (Vata, Pitta, Kapha). Suitable for both men and women.',
     netQuantity: '100g',
     shelfLife: '24 Months from manufacturing date',
@@ -35,7 +35,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     reviewsList: [
       { id: 'r1', author: 'Pooja Kulkarni', rating: 5, date: '2 days ago', comment: 'This authentic Ayurvedic formulation gave my skin an instant radiant golden glow! Pure botanical feel with no chemicals.', verified: true },
       { id: 'r2', author: 'Aniket Deshmukh', rating: 5, date: '5 days ago', comment: 'Gently cleared deep sun tanning within a week. The fragrance is pure natural sandalwood and herbs.', verified: true },
-      { id: 'r3', author: 'Sneha Patil', rating: 5, date: '1 week ago', comment: 'Truly authentic. Mixed with SHRiTEJ Rose Water, it leaves skin nourished without any dryness.', verified: true },
+      { id: 'r3', author: 'Sneha Patil', rating: 5, date: '1 week ago', comment: 'Truly authentic. Mixed with SHRITEJ Rose Water, it leaves skin nourished without any dryness.', verified: true },
       { id: 'r4', author: 'Rahul Shinde', rating: 4.9, date: '2 weeks ago', comment: 'Unbeatable craftsmanship and earth-conscious biodegradable wrap. Genuine Indian wellness.', verified: true }
     ],
     specs: {
@@ -48,7 +48,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'rose-water',
-    name: 'SHRiTEJ Kannauj Pure Steam-Distilled Gulab Jal (200ml)',
+    name: 'SHRITEJ Kannauj Pure Steam-Distilled Gulab Jal (200ml)',
     tagline: '100% Pure Distillate natural face toner & Ayurvedic ubtan activator',
     price: 249,
     originalPrice: 349,
@@ -59,7 +59,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 65,
     isFeatured: true,
     isNewArrival: true,
-    description: 'SHRiTEJ AYURVED Premium Rose Water is crafted via classical Deg-Bhapka hydro-steam distillation of freshly handpicked Kannauj Damask roses. 100% pure steam-distilled floral hydrosol. Balances skin pH, calms flushed redness, tightens enlarged pores, and acts as the perfect botanical activator for SHRiTEJ Ayurvedic Ubtan.',
+    description: 'SHRITEJ AYURVED Premium Rose Water is crafted via classical Deg-Bhapka hydro-steam distillation of freshly handpicked Kannauj Damask roses. 100% pure steam-distilled floral hydrosol. Balances skin pH, calms flushed redness, tightens enlarged pores, and acts as the perfect botanical activator for SHRITEJ Ayurvedic Ubtan.',
     ingredients: '100% Pure Steam Distillate of fresh Indian Damask Roses (Rosa damascena hydrosol). Zero added alcohol, artificial fragrance, or synthetic preservatives.',
     ayurvedicBenefits: [
       'Traditionally cools excess Pitta heat in facial skin',
@@ -67,7 +67,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       'Acts as a gentle botanical astringent to refine pore appearance',
       'Aromatherapeutic Damask rose essence calms senses'
     ],
-    howToUse: 'Spritz generously onto cleansed face and neck morning and evening. Allow to air absorb. Alternatively, use 2 tablespoons to activate SHRiTEJ Traditional Ayurvedic Ubtan into a smooth paste.',
+    howToUse: 'Spritz generously onto cleansed face and neck morning and evening. Allow to air absorb. Alternatively, use 2 tablespoons to activate SHRITEJ Traditional Ayurvedic Ubtan into a smooth paste.',
     suitableFor: 'All skin types, especially sensitive and inflamed Pitta skin.',
     netQuantity: '200ml',
     shelfLife: '18 Months from distillation',
@@ -90,7 +90,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'chandan-bar',
-    name: 'SHRiTEJ Mysore Sandalwood & A2 Ghee Soap (125g)',
+    name: 'SHRITEJ Mysore Sandalwood & A2 Ghee Soap (125g)',
     tagline: 'Artisan handmade bath bar with Pure Mysore Sandalwood & Vedic A2 Cow Ghee',
     price: 189,
     originalPrice: 260,
@@ -101,7 +101,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 70,
     isFeatured: true,
     isNewArrival: true,
-    description: 'SHRiTEJ AYURVED Mysore Sandalwood Bath Bar is an artisan cold-cured soap enriched with real Indian Sandalwood paste, Vedic A2 Cow Ghee, and virgin cold-pressed coconut oil. Produces a velvety, creamy lather that deep cleanses pores while sealing natural skin lipids without tightness.',
+    description: 'SHRITEJ AYURVED Mysore Sandalwood Bath Bar is an artisan cold-cured soap enriched with real Indian Sandalwood paste, Vedic A2 Cow Ghee, and virgin cold-pressed coconut oil. Produces a velvety, creamy lather that deep cleanses pores while sealing natural skin lipids without tightness.',
     ingredients: 'Pure Mysore Sandalwood Extract (Santalum album), Vedic Gir Cow A2 Ghee, Saponified Virgin Coconut Oil, Castor Oil, Mahua Oil, Botanical Glycerin, Natural Sandalwood Essential Oil.',
     ayurvedicBenefits: [
       'Pure Chandan cools and soothes irritated, sun-stressed skin',
@@ -132,7 +132,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'ubtan-glow-combo',
-    name: 'SHRiTEJ Royal Ubtan & Rose Water Ritual Duo',
+    name: 'SHRITEJ Royal Ubtan & Rose Water Ritual Duo',
     tagline: 'Complete Ayurvedic glowing ritual pack with Steam-Distilled Gulab Jal',
     price: 499,
     originalPrice: 749,
@@ -143,8 +143,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 40,
     isFeatured: true,
     isNewArrival: false,
-    description: 'The ultimate Ayurvedic glow pairing. Includes authentic SHRiTEJ Traditional Ayurvedic Ubtan (100g) paired with our 100% pure Kannauj Rose Water to create the perfect soothing paste for regular exfoliation, instant tan reversal, and deep hydration.',
-    ingredients: 'Combo kit containing 1x SHRiTEJ Traditional Ubtan (100g) and 1x Kannauj Pure Rose Water (200ml).',
+    description: 'The ultimate Ayurvedic glow pairing. Includes authentic SHRITEJ Traditional Ayurvedic Ubtan (100g) paired with our 100% pure Kannauj Rose Water to create the perfect soothing paste for regular exfoliation, instant tan reversal, and deep hydration.',
+    ingredients: 'Combo kit containing 1x SHRITEJ Traditional Ubtan (100g) and 1x Kannauj Pure Rose Water (200ml).',
     ayurvedicBenefits: [
       'Comprehensive synergistic treatment for uneven skin tone',
       'Rose water acts as the optimal botanical carrier for Ubtan actives',
@@ -172,7 +172,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'ubtan-snana-trio',
-    name: 'SHRiTEJ Complete Ayurvedic Snana Box (3-Piece)',
+    name: 'SHRITEJ Complete Ayurvedic Snana Box (3-Piece)',
     tagline: 'The Ultimate 3-Piece Traditional Bathing & Glow Ritual',
     price: 699,
     originalPrice: 1050,
@@ -183,7 +183,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 35,
     isFeatured: true,
     isNewArrival: true,
-    description: 'An all-inclusive Ayurvedic body and skin care sanctuary box. Contains SHRiTEJ Ayurvedic Ubtan (100g), Mysore Sandalwood & A2 Ghee Soap (125g), and Pure Kannauj Rose Water (200ml) for a royal snana ritual at home.',
+    description: 'An all-inclusive Ayurvedic body and skin care sanctuary box. Contains SHRITEJ Ayurvedic Ubtan (100g), Mysore Sandalwood & A2 Ghee Soap (125g), and Pure Kannauj Rose Water (200ml) for a royal snana ritual at home.',
     ingredients: 'Complete trio: Ubtan Herbal Powder, Mysore Sandalwood Cold-Cured Soap, Steam-Distilled Rose Water.',
     ayurvedicBenefits: [
       'Cleanses, exfoliates, and balances total body skin vitality',
@@ -211,7 +211,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'ubtan-family-200g',
-    name: 'SHRiTEJ Ayurvedic Ubtan Family Pack (200g)',
+    name: 'SHRITEJ Ayurvedic Ubtan Family Pack (200g)',
     tagline: 'Double value pack of our signature herbal glowing ubtan',
     price: 499,
     originalPrice: 799,
@@ -222,7 +222,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 50,
     isFeatured: true,
     isNewArrival: false,
-    description: 'Economical family size pouch of authentic SHRiTEJ Ayurvedic Ubtan. Ideal for daily face cleansing, bridal glow prep, and weekly whole-body traditional Ayurvedic bath (snana). Packed with Manjishta, Chandan, Lodhra, and Halad.',
+    description: 'Economical family size pouch of authentic SHRITEJ Ayurvedic Ubtan. Ideal for daily face cleansing, bridal glow prep, and weekly whole-body traditional Ayurvedic bath (snana). Packed with Manjishta, Chandan, Lodhra, and Halad.',
     ingredients: 'Manjishta, Chandan, Vetchandan, Lodhra, Nagkesar, Multani Mitti, Halad, Gulab Petals.',
     ayurvedicBenefits: [
       'Ample quantity for whole body Ayurvedic snana (bath ritual)',
@@ -250,7 +250,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'kumkumadi-oil',
-    name: 'SHRiTEJ Kumkumadi Miraculous Beauty Tailam (30ml)',
+    name: 'SHRITEJ Kumkumadi Miraculous Beauty Tailam (30ml)',
     tagline: 'Ancient Kashmiri Saffron elixir with 26 classical botanicals',
     price: 799,
     originalPrice: 1299,
@@ -261,7 +261,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     stock: 0,
     isFeatured: true,
     isNewArrival: false,
-    description: 'Formulated according to classical Ashtanga Hridaya taila paka methods. Infused with Grade-A Kashmiri Mogra Saffron, Red Sandalwood, Manjishta, and sacred lotus stamens in cold-pressed sesame oil. Apply nightly after washing off SHRiTEJ Ubtan to seal in moisture and rejuvenate skin tone.',
+    description: 'Formulated according to classical Ashtanga Hridaya taila paka methods. Infused with Grade-A Kashmiri Mogra Saffron, Red Sandalwood, Manjishta, and sacred lotus stamens in cold-pressed sesame oil. Apply nightly after washing off SHRITEJ Ubtan to seal in moisture and rejuvenate skin tone.',
     ingredients: 'Kashmiri Kesar (Crocus sativus), Raktachandana, Manjishta, Yashtimadhu, Ushira, Padmaka, Kamal Kesar, Cold-Pressed Black Sesame Oil, Goat Milk decoction.',
     ayurvedicBenefits: [
       'Traditionally celebrated as classical "Varnya Tailam" for radiant skin',
@@ -289,7 +289,7 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'neem-tulsi-lepa',
-    name: 'SHRiTEJ Purifying Neem & Tulsi Anti-Blemish Lepa (100g)',
+    name: 'SHRITEJ Purifying Neem & Tulsi Anti-Blemish Lepa (100g)',
     tagline: 'Targeted clarifying herbal clay pack for active acne and oil control',
     price: 320,
     originalPrice: 450,
@@ -307,7 +307,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       'Natural anti-bacterial botanical action without drying alcohols',
       'Tightens pores and clarifies dull oily complexion'
     ],
-    howToUse: 'Mix 1 teaspoon with SHRiTEJ Rose Water or fresh curd. Apply onto blemish-prone areas or full face. Rinse after 10-12 minutes.',
+    howToUse: 'Mix 1 teaspoon with SHRITEJ Rose Water or fresh curd. Apply onto blemish-prone areas or full face. Rinse after 10-12 minutes.',
     suitableFor: 'Oily, acne-prone, and combination skin.',
     netQuantity: '100g',
     shelfLife: '24 Months',

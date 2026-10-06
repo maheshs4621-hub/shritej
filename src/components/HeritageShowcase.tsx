@@ -21,7 +21,7 @@ export const HeritageShowcase: React.FC<HeritageShowcaseProps> = ({
       title: 'Rooted in the Living Wisdom of Tridoshas',
       subtitle: 'Harmonizing Vata, Pitta, and Kapha with pure plant energetics.',
       content:
-        'In classical Ayurveda, skin is not a surface to be bleached or masked with synthetics; it is a living organ reflecting internal equilibrium (Dhatu Samya). Every SHRiTEJ formulation is handcrafted to pacify Pitta inflammation, detoxify Kapha congestion, and deeply nourish Vata dryness using centuries-tested botanical synergies.',
+        'In classical Ayurveda, skin is not a surface to be bleached or masked with synthetics; it is a living organ reflecting internal equilibrium (Dhatu Samya). Every SHRITEJ formulation is handcrafted to pacify Pitta inflammation, detoxify Kapha congestion, and deeply nourish Vata dryness using centuries-tested botanical synergies.',
       highlights: [
         'Classical Ashtanga Hridaya taila paka recipes',
         'Pure cooling Manjishta, Chandan, and Lodhra actives',
@@ -72,7 +72,7 @@ export const HeritageShowcase: React.FC<HeritageShowcaseProps> = ({
       title: 'Handcrafted in Small Batches in India',
       subtitle: 'Honest ingredients, verified provenance, zero hidden chemicals.',
       content:
-        'SHRiTEJ AYURVED was founded on an unwavering commitment: no synthetic fragrance oils, no artificial foaming agents, and no parabens. What is written on our labels is exactly what is inside our formulations. Every batch is individually handcrafted with devotion, integrity, and reverence for Indian wellness heritage.',
+        'SHRITEJ AYURVED was founded on an unwavering commitment: no synthetic fragrance oils, no artificial foaming agents, and no parabens. What is written on our labels is exactly what is inside our formulations. Every batch is individually handcrafted with devotion, integrity, and reverence for Indian wellness heritage.',
       highlights: [
         '100% Botanical ingredients with full label transparency',
         'Cruelty-free, vegetarian, and ethically wildcrafted',
@@ -96,7 +96,7 @@ export const HeritageShowcase: React.FC<HeritageShowcaseProps> = ({
             <span>Sacred Craftsmanship &amp; Heritage</span>
           </div>
           <h2 className="font-brand text-3xl sm:text-5xl font-bold tracking-[0.06em] text-[#222E22]">
-            The Pillars of SHRiTEJ
+            The Pillars of SHRITEJ
           </h2>
           <p className="font-editorial text-lg sm:text-xl text-[#594B3C] max-w-2xl mx-auto leading-relaxed">
             Where classical Ayurvedic wisdom meets uncompromising purity and mindful environmental stewardship.
@@ -196,7 +196,7 @@ export const HeritageShowcase: React.FC<HeritageShowcaseProps> = ({
               />
               <div className="mt-4 text-center space-y-1">
                 <p className="font-brand text-xs uppercase tracking-[0.2em] text-[#2D3E2F] font-bold">
-                  SHRiTEJ Pure Apothecary
+                  SHRITEJ Pure Apothecary
                 </p>
                 <p className="font-editorial italic text-xs text-[#735D43]">
                   100% Botanical Actives • Cold-Cured • Made in India

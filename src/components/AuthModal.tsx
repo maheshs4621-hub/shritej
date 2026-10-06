@@ -275,7 +275,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleQuickAdmin = () => {
     const user: UserProfile = {
       id: 'patron-admin-01',
-      name: 'SHRiTEJ Administrator',
+      name: 'SHRITEJ Administrator',
       email: 'admin@shritejayurveda.com',
       phone: '+91 98765 00000',
       provider: 'email',
@@ -467,7 +467,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </button>
 
                 <p className="text-center text-[11px] text-[#695A48] pt-1">
-                  First time visiting SHRiTEJ?{' '}
+                  First time visiting SHRITEJ?{' '}
                   <button
                     type="button"
                     onClick={handleGoToRegister}

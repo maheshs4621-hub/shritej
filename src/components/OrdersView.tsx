@@ -13,7 +13,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ orders, onExplore }) => 
       <div className="flex items-center justify-between pb-4 border-b border-[#DECDB3]">
         <div>
           <h2 className="text-2xl font-bold text-[#222E22] flex items-center gap-2">
-            <Package className="w-6 h-6 text-[#7D5A34]" /> Your SHRiTEJ Orders
+            <Package className="w-6 h-6 text-[#7D5A34]" /> Your SHRITEJ Orders
           </h2>
           <p className="text-[#6D5D4C] text-xs mt-1">
             Track your dispatch, order details, and historical Ayurvedic purchases.
@@ -31,7 +31,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ orders, onExplore }) => 
             onClick={onExplore}
             className="px-6 py-2.5 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui font-semibold text-xs transition-all shadow-md"
           >
-            Explore SHRiTEJ Formulations
+            Explore SHRITEJ Formulations
           </button>
         </div>
       ) : (

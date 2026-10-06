@@ -27,7 +27,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onContactClick }) => {
       category: 'Orders & Tracking',
       items: [
         {
-          q: 'How do I place an order on SHRiTEJ AYURVED?',
+          q: 'How do I place an order on SHRITEJ AYURVED?',
           a: 'Browse our classical formulations catalogue, select your desired products and quantities, click "Add to Basket" or "Buy Now", and proceed to our secure, plastic-free checkout.'
         },
         {
@@ -45,7 +45,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onContactClick }) => {
       items: [
         {
           q: 'How should I activate and apply the Traditional Ubtan?',
-          a: 'Mix 1-2 teaspoons of SHRiTEJ Ubtan with pure Kannauj Rose Water (for normal/oily skin) or raw organic milk/curd (for dry skin) in a ceramic or wooden bowl. Apply evenly, let sit for 12-15 minutes until semi-dry, and rinse with cool water in circular movements.'
+          a: 'Mix 1-2 teaspoons of SHRITEJ Ubtan with pure Kannauj Rose Water (for normal/oily skin) or raw organic milk/curd (for dry skin) in a ceramic or wooden bowl. Apply evenly, let sit for 12-15 minutes until semi-dry, and rinse with cool water in circular movements.'
         },
         {
           q: 'How should Ayurvedic herbal products be stored?',
@@ -53,7 +53,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onContactClick }) => {
         },
         {
           q: 'Are any synthetic preservatives, parabens, or artificial colors used?',
-          a: 'Never. Every formulation from SHRiTEJ AYURVED is 100% natural and pure herbal. We maintain full transparency in our ingredient disclosures.'
+          a: 'Never. Every formulation from SHRITEJ AYURVED is 100% natural and pure herbal. We maintain full transparency in our ingredient disclosures.'
         }
       ]
     },
@@ -104,7 +104,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ onContactClick }) => {
       category: 'Ayurvedic Authenticity',
       items: [
         {
-          q: 'What makes SHRiTEJ AYURVED distinct from commercial cosmetics?',
+          q: 'What makes SHRITEJ AYURVED distinct from commercial cosmetics?',
           a: 'We reject industrial mass-marketing gimmicks. Our formulations are prepared strictly in accordance with traditional texts using authentic stone pulverization, slow oil infusion, and steam hydrosols — wrapped only in earth-conscious biodegradable kraft and handmade paper.'
         },
         {

@@ -39,7 +39,7 @@ export const SustainabilityPage: React.FC<SustainabilityPageProps> = ({ onShopCl
               The modern cosmetics industry produces over 120 billion units of single-use plastic packaging each year — most of which lingers in landfills and oceans for 500 years. It is an insult to Ayurveda to place pure sacred herbs inside petrochemical plastics destined to pollute the sacred rivers.
             </p>
             <p>
-              At <strong>SHRiTEJ AYURVED</strong>, we hold a simple guiding rule: <em>If it cannot return gently to the soil, it does not belong in our apothecary.</em>
+              At <strong>SHRITEJ AYURVED</strong>, we hold a simple guiding rule: <em>If it cannot return gently to the soil, it does not belong in our apothecary.</em>
             </p>
           </div>
         </div>

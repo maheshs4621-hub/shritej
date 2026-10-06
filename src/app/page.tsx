@@ -488,7 +488,7 @@ export default function ShritejAyurvedaApp() {
 
                 {newsletterSuccess ? (
                   <div className="p-4 bg-[#E2EBDD] text-[#2D3E2F] rounded-2xl border border-[#C5D9BE] font-ui text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
-                    <Check className="w-4 h-4" /> Welcome to the SHRiTEJ Sanctuary.
+                    <Check className="w-4 h-4" /> Welcome to the SHRITEJ Sanctuary.
                   </div>
                 ) : (
                   <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex items-center gap-2">

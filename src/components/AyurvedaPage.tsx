@@ -135,7 +135,7 @@ export const AyurvedaPage: React.FC<AyurvedaPageProps> = ({ onShopClick, onBack 
                 </span>
                 <h3 className="font-brand text-base font-bold text-[#222E22]">Nourish &amp; Bathe</h3>
                 <p className="font-editorial text-sm text-[#544537] leading-relaxed">
-                  Apply botanical <strong>SHRiTEJ Ubtan</strong> or Mysore Sandalwood soap. This stimulates lymphatic circulation and leaves skin naturally radiant.
+                  Apply botanical <strong>SHRITEJ Ubtan</strong> or Mysore Sandalwood soap. This stimulates lymphatic circulation and leaves skin naturally radiant.
                 </p>
               </div>
               <span className="font-ui text-[11px] text-[#7D6B58] font-semibold border-t border-[#DECDB3] pt-2">

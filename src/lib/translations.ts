@@ -81,7 +81,7 @@ export const TRANSLATIONS = {
 
     // Footer & Misc
     earthStewardship: 'Zero Unnecessary Plastic • 100% Biodegradable Shipping',
-    allRightsReserved: '© 2026 SHRiTEJ AYURVED. Handcrafted in India. Inspired by Classical Traditions.',
+    allRightsReserved: '© 2026 SHRITEJ AYURVED. Handcrafted in India. Inspired by Classical Traditions.',
   },
   hi: {
     langName: 'हिंदी',

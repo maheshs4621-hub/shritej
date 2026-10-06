@@ -270,7 +270,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <span>Super Admin Portal</span>
             </div>
             <h1 className="font-brand text-2xl sm:text-3xl font-bold text-[#222E22]">
-              SHRiTEJ AYURVED
+              SHRITEJ AYURVED
             </h1>
             <p className="font-editorial text-xs sm:text-sm text-[#6A5947]">
               Central administration, inventory, and logistics console
@@ -363,7 +363,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-brand text-xl sm:text-2xl font-bold text-[#222E22]">
-                  SHRiTEJ Central Console
+                  SHRITEJ Central Console
                 </h1>
                 <span className="px-2.5 py-0.5 rounded-full bg-[#E3EBDC] text-[#2D3E2F] font-ui text-[10px] font-bold uppercase tracking-wider">
                   Super Admin Live

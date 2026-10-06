@@ -41,7 +41,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </svg>
               </div>
               <h3 className="font-brand text-xl sm:text-2xl font-bold tracking-[0.25em] text-[#222E22]">
-                SHRiTEJ AYURVED
+                SHRITEJ AYURVED
               </h3>
             </div>
             <p className="font-editorial italic text-base text-[#6E5943] leading-relaxed max-w-sm">
@@ -182,7 +182,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Copyright */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 font-ui text-[10px] sm:text-[11px] text-[#7A6B5B] text-center sm:text-left border-t border-[#DECDB3]/60 pt-6">
-          <p>© 2026 SHRiTEJ AYURVED. Handcrafted in India. Inspired by Classical Traditions.</p>
+          <p>© 2026 SHRITEJ AYURVED. Handcrafted in India. Inspired by Classical Traditions.</p>
           <p>Authentic Ayurveda • Traditional Preparation • Earth Stewardship</p>
         </div>
 

@@ -14,7 +14,7 @@ const SEED_PATRONS: RegisteredPatron[] = [
   },
   {
     id: 'patron-admin-01',
-    name: 'SHRiTEJ Administrator',
+    name: 'SHRITEJ Administrator',
     email: 'admin@shritejayurveda.com',
     phone: '9876500000',
     password: 'adminayurveda',

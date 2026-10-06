@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         amount: amountInPaise,
         currency: 'INR',
         receipt: receipt || ('rcpt_' + Date.now()),
-        notes: notes || { brand: 'SHRiTEJ AYURVED' },
+        notes: notes || { brand: 'SHRITEJ AYURVED' },
       });
 
       return NextResponse.json({

@@ -193,7 +193,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency || 'INR',
-          name: 'SHRiTEJ AYURVED',
+          name: 'SHRITEJ AYURVED',
           description: 'Authentic Ayurvedic Formulations',
           image: '/images/shritej-ubtan.jpg',
           order_id: orderData.orderId,

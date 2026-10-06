@@ -15,7 +15,7 @@ export const OurStoryPage: React.FC<OurStoryPageProps> = ({ onShopClick, onAyurv
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#EFE6D6] border border-[#D5C4A7] text-[#694F32] font-ui text-[10px] sm:text-[11px] tracking-[0.25em] uppercase font-bold">
             <Feather className="w-3.5 h-3.5 text-[#8A6A42]" />
-            <span>The Genesis of SHRiTEJ AYURVED</span>
+            <span>The Genesis of SHRITEJ AYURVED</span>
           </div>
           <p className="font-deva text-lg sm:text-2xl text-[#7D5A34] tracking-wider">॥ सत्यं परं धीमहि ॥</p>
           <h1 className="font-brand text-3xl sm:text-5xl lg:text-6xl font-bold tracking-[0.06em] text-[#222E22] leading-tight">
@@ -40,7 +40,7 @@ export const OurStoryPage: React.FC<OurStoryPageProps> = ({ onShopClick, onAyurv
               In a world crowded by instant gratification, synthetic foaming agents, artificial fragrances, and chemical bleaching agents masked behind green labels, the true spirit of Ayurveda had become diluted.
             </p>
             <p>
-              <strong>SHRiTEJ AYURVED</strong> was born out of a heartfelt resolve: to return entirely to classical Vedic literature — where herbal powders (Churna), healing mud packs (Lepa), cold-pressed oils (Sneha), and steam floral waters (Arka) are prepared with utmost patience and reverence for nature&rsquo;s living intelligence.
+              <strong>SHRITEJ AYURVED</strong> was born out of a heartfelt resolve: to return entirely to classical Vedic literature — where herbal powders (Churna), healing mud packs (Lepa), cold-pressed oils (Sneha), and steam floral waters (Arka) are prepared with utmost patience and reverence for nature&rsquo;s living intelligence.
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export const OurStoryPage: React.FC<OurStoryPageProps> = ({ onShopClick, onAyurv
               &ldquo;We do not innovate by inventing synthetic shortcuts. We innovate by strictly preserving the sacred Ayurvedic methods that our ancestors perfected over millennia.&rdquo;
             </blockquote>
             <p className="font-brand text-sm tracking-widest uppercase text-[#C9A24D] font-semibold">
-              — The Guardians of SHRiTEJ AYURVED
+              — The Guardians of SHRITEJ AYURVED
             </p>
           </div>
         </div>

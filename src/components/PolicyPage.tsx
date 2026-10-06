@@ -18,7 +18,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ type, onBack }) => {
         },
         {
           heading: '2. Payment Security & Integrity',
-          body: 'SHRiTEJ AYURVED does not store, process, or view full payment card numbers, UPI PINs, or net-banking passwords. All payment transactions are encrypted and processed by RBI-licensed payment aggregators.'
+          body: 'SHRITEJ AYURVED does not store, process, or view full payment card numbers, UPI PINs, or net-banking passwords. All payment transactions are encrypted and processed by RBI-licensed payment aggregators.'
         },
         {
           heading: '3. Non-Disclosure Commitment',
@@ -32,7 +32,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ type, onBack }) => {
     },
     terms: {
       title: 'Terms & Conditions',
-      subtitle: 'Guidelines Governing Use of the SHRiTEJ AYURVED Platform',
+      subtitle: 'Guidelines Governing Use of the SHRITEJ AYURVED Platform',
       sections: [
         {
           heading: '1. Acceptance of Terms',
@@ -48,7 +48,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ type, onBack }) => {
         },
         {
           heading: '4. Intellectual Property',
-          body: 'All brand graphics, text, sacred formulation rituals, and imagery are proprietary property of SHRiTEJ AYURVED.'
+          body: 'All brand graphics, text, sacred formulation rituals, and imagery are proprietary property of SHRITEJ AYURVED.'
         }
       ]
     },
@@ -149,7 +149,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ type, onBack }) => {
         </div>
 
         <div className="p-6 bg-[#F4EDE2] rounded-2xl border border-[#DECDB3] text-xs font-ui text-[#7A6B5B] flex items-center justify-between">
-          <span>Effective Date: 2026. SHRiTEJ AYURVED.</span>
+          <span>Effective Date: 2026. SHRITEJ AYURVED.</span>
           <span>Inquiries: care@shritejayurveda.com</span>
         </div>
 

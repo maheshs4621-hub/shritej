@@ -82,7 +82,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
           </p>
 
           <h1 className="font-brand text-2xl sm:text-4xl font-bold tracking-[0.22em] text-[#222E22] uppercase">
-            SHRiTEJ <span className="text-[#7D5A34] font-normal">AYURVED</span>
+            SHRITEJ <span className="text-[#7D5A34] font-normal">AYURVED</span>
           </h1>
 
           <p className="font-editorial italic text-sm sm:text-base text-[#6B5A46] tracking-wide">

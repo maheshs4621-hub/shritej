@@ -88,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({ onExplore, onStory, onAyurveda, lang
               </div>
               <img
                 src="/images/shritej-ubtan.jpg"
-                alt="Shritej Ayurveda Traditional Ayurvedic Ubtan"
+                alt="SHRITEJ Ayurved Traditional Ayurvedic Ubtan"
                 className="w-64 sm:w-80 rounded-2xl object-cover shadow-lg border border-[#D5C2A4]"
               />
               <div className="mt-3 sm:mt-4 text-center space-y-1">

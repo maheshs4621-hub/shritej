@@ -17,7 +17,7 @@ export const ContactPage: React.FC = () => {
   const CONTACT_PHONE = '+91 80802 18728';
   const WHATSAPP_NUMBER = '918080218728';
   const BUSINESS_HOURS = 'Monday – Saturday: 9:30 AM – 6:30 PM IST';
-  const DISPATCH_SANCTUARY = 'SHRiTEJ Botanical Apothecary, Maharashtra, India';
+  const DISPATCH_SANCTUARY = 'SHRITEJ Botanical Apothecary, Maharashtra, India';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +48,7 @@ export const ContactPage: React.FC = () => {
             <span>Connect with our Sanctuary</span>
           </div>
           <h1 className="font-brand text-3xl sm:text-5xl font-bold tracking-[0.06em] text-[#222E22]">
-            Contact SHRiTEJ AYURVED
+            Contact SHRITEJ AYURVED
           </h1>
           <p className="font-editorial text-lg sm:text-xl text-[#594B3C] leading-relaxed max-w-2xl mx-auto">
             Have a question regarding your skin prakriti, an ongoing order, or our traditional methods? We are here to guide you with care and authenticity.
@@ -70,7 +70,7 @@ export const ContactPage: React.FC = () => {
               <p className="font-editorial text-sm text-[#594B3C]">Direct written consultations and corporate inquiries.</p>
             </div>
             <a
-              href={`mailto:${CONTACT_EMAIL}?subject=SHRiTEJ%20Ayurved%20Inquiry`}
+              href={`mailto:${CONTACT_EMAIL}?subject=SHRITEJ%20Ayurved%20Inquiry`}
               className="w-full py-3 px-4 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-xs uppercase tracking-wider font-semibold text-center transition-all shadow-sm"
             >
               Email Us
@@ -106,7 +106,7 @@ export const ContactPage: React.FC = () => {
               <p className="font-editorial text-sm text-[#594B3C]">Instant assistance for order status and tracking.</p>
             </div>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Namaste%20SHRiTEJ%20AYURVED,%20I%20have%20an%20inquiry.`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Namaste%20SHRITEJ%20AYURVED,%20I%20have%20an%20inquiry.`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 px-4 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-xs uppercase tracking-wider font-semibold text-center transition-all shadow-sm"
