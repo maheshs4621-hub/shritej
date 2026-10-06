@@ -73,7 +73,7 @@ export interface UserProfile {
   email: string;
   phone?: string;
   avatar?: string;
-  provider: 'google' | 'email';
+  provider: 'google' | 'email' | 'phone';
   isAdmin?: boolean;
   addresses?: {
     address: string;
@@ -103,3 +103,13 @@ export type ViewType =
   | 'disclaimer';
 
 export type Language = 'en' | 'hi' | 'mr';
+
+export interface RegisteredPatron {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  createdAt: string;
+  isAdmin?: boolean;
+}

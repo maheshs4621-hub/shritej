@@ -114,7 +114,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({
                   </div>
                   <p className="font-ui text-xs text-[#7A6B5B]">{currentUser.email}</p>
                   <span className="font-ui text-[10px] text-[#2D3E2F] inline-flex items-center gap-1 font-semibold mt-1">
-                    <ShieldCheck className="w-3 h-3" /> Signed in via {currentUser.provider === 'google' ? 'Google Authenticated' : 'Email Account'}
+                    <ShieldCheck className="w-3 h-3" /> Signed in via {currentUser.provider === 'google' ? 'Google Authenticated' : currentUser.provider === 'phone' ? 'Mobile OTP Verified' : 'Registered Sacred Password'}
                   </span>
                 </div>
               </div>
