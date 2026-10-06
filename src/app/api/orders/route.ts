@@ -54,7 +54,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: true, orders: [], error: error.message });
     }
 
-    const orders = (data || []).map(mapDbToOrder);
+    const orders = (data || [])
+      .filter((r: any) => {
+        const name = (r.customer_name || '').toLowerCase();
+        const em = (r.customer_email || '').toLowerCase();
+        if (email) {
+          return em === email.toLowerCase();
+        }
+        return !name.includes('mahesh') && !em.includes('mahesh');
+      })
+      .map(mapDbToOrder);
     return NextResponse.json({ success: true, orders, source: 'database' });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

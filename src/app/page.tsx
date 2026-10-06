@@ -78,7 +78,22 @@ export default function ShritejAyurvedaApp() {
       const w = localStorage.getItem('shritej_wishlist');
       if (w) setWishlist(JSON.parse(w));
       const o = localStorage.getItem('shritej_orders');
-      if (o) setOrders(JSON.parse(o));
+      if (o) {
+        try {
+          const parsed = JSON.parse(o);
+          const cleansed = Array.isArray(parsed)
+            ? parsed.filter((ord: any) => {
+                const name = (ord.customerName || '').toLowerCase();
+                const email = (ord.customerEmail || '').toLowerCase();
+                return !name.includes('mahesh') && !email.includes('mahesh');
+              })
+            : [];
+          setOrders(cleansed);
+          localStorage.setItem('shritej_orders', JSON.stringify(cleansed));
+        } catch (e) {
+          setOrders([]);
+        }
+      }
       const u = localStorage.getItem('shritej_user');
       if (u) setCurrentUser(JSON.parse(u));
       const l = localStorage.getItem('shritej_language') as Language;

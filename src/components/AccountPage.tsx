@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { User, Package, MapPin, LogIn, CheckCircle2, ShieldCheck, Mail, Truck, ExternalLink, ArrowRight, LogOut } from 'lucide-react';
 import { Order, UserProfile } from '../types';
 
@@ -49,6 +49,45 @@ export const AccountPage: React.FC<AccountPageProps> = ({
     };
     fetchUserOrders();
   }, [currentUser, orders]);
+
+  // Filter orders strictly for current logged-in user and ensure Mahesh Swami test orders are permanently cleared
+  const userOrders = useMemo(() => {
+    if (!currentUser) return [];
+    return liveOrders.filter((ord) => {
+      const name = (ord.customerName || '').toLowerCase();
+      const email = (ord.customerEmail || '').toLowerCase();
+      if (name.includes('mahesh') || email.includes('mahesh')) {
+        return false;
+      }
+      const matchEmail = currentUser.email && email === currentUser.email.toLowerCase();
+      const matchPhone = currentUser.phone && ord.customerPhone?.replace(/\D/g, '') === currentUser.phone.replace(/\D/g, '');
+      return matchEmail || matchPhone;
+    });
+  }, [liveOrders, currentUser]);
+
+  const handleClearHistory = () => {
+    if (!currentUser) return;
+    setLiveOrders((prev) =>
+      prev.filter((ord) => {
+        const email = (ord.customerEmail || '').toLowerCase();
+        return email !== currentUser.email.toLowerCase();
+      })
+    );
+    try {
+      const stored = localStorage.getItem('shritej_orders');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const filtered = Array.isArray(parsed)
+          ? parsed.filter((ord: any) => {
+              const email = (ord.customerEmail || '').toLowerCase();
+              const name = (ord.customerName || '').toLowerCase();
+              return email !== currentUser.email.toLowerCase() && !name.includes('mahesh') && !email.includes('mahesh');
+            })
+          : [];
+        localStorage.setItem('shritej_orders', JSON.stringify(filtered));
+      }
+    } catch (e) {}
+  };
 
   const isLoggedIn = !!currentUser;
 
@@ -132,12 +171,23 @@ export const AccountPage: React.FC<AccountPageProps> = ({
                 <h2 className="font-brand text-xl font-bold text-[#222E22] uppercase tracking-wider">
                   Order History &amp; Dispatch Status
                 </h2>
-                <span className="font-ui text-xs text-[#7A6B5B]">
-                  {liveOrders.length} {liveOrders.length === 1 ? 'Order' : 'Orders'} Found
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="font-ui text-xs text-[#7A6B5B]">
+                    {userOrders.length} {userOrders.length === 1 ? 'Order' : 'Orders'} Found
+                  </span>
+                  {userOrders.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearHistory}
+                      className="font-ui text-xs text-rose-700 hover:text-rose-900 font-semibold underline"
+                    >
+                      Clear History
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {liveOrders.length === 0 ? (
+              {userOrders.length === 0 ? (
                 <div className="p-12 text-center space-y-3 bg-[#FAF7F2] rounded-3xl border border-[#DECDB3]">
                   <Package className="w-10 h-10 text-[#9A8973] mx-auto" />
                   <h4 className="font-brand text-base font-bold text-[#222E22]">No Active Orders Placed Yet</h4>
@@ -153,7 +203,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {liveOrders.map((ord) => (
+                  {userOrders.map((ord) => (
                     <div
                       key={ord.id}
                       className="bg-[#FAF7F2] border border-[#DECDB3] rounded-3xl p-6 space-y-4 shadow-sm"

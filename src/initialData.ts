@@ -296,7 +296,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 5,
     category: 'Ubtan & Lepa',
-    image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80',
+    image: '/images/placeholder-lepa.svg',
     stock: 0,
     isFeatured: false,
     isNewArrival: true,
