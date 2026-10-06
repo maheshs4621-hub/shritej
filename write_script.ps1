@@ -1,0 +1,1 @@
+param(, ) [IO.File]::WriteAllBytes(, [Convert]::FromBase64String())

@@ -1,0 +1,1 @@
+Write-Output " PS1 script works\

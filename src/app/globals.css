@@ -1,0 +1,21 @@
+@import "tailwindcss";
+:root {
+  --font-serif-heading: 'Cinzel', 'Eczar', serif;
+  --font-serif-body: 'Cormorant Garamond', Georgia, serif;
+  --font-sans-ui: 'Plus Jakarta Sans', -apple-system, sans-serif;
+}
+body {
+  font-family: var(--font-serif-body);
+  background-color: #F8F5EE;
+  color: #2D2722;
+  background-image: radial-gradient(#d6cfbf 0.75px, transparent 0.75px);
+  background-size: 24px 24px;
+}
+.font-brand { font-family: var(--font-serif-heading); letter-spacing: 0.15em; }
+.font-editorial { font-family: var(--font-serif-body); }
+.font-deva { font-family: 'Eczar', serif; }
+.font-ui { font-family: var(--font-sans-ui); }
+::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar-track { background: #F3EFE6; }
+::-webkit-scrollbar-thumb { background: #BFA986; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9E855F; }
