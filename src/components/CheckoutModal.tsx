@@ -82,7 +82,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const customerDetails = {
       name: name || 'Valued Patron',
       email: email || 'patron@shritejayurveda.com',
-      phone: phone || '+91 80802 18728',
+      phone: phone || '+91 98765 43210',
       address: orderAddress,
       paymentMethod,
     };
@@ -226,7 +226,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Mahesh Swami"
+                  placeholder="e.g. Rahul Sharma"
                   className="w-full px-4 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-xs font-ui focus:border-[#7D5A34] focus:outline-none"
                 />
               </div>
@@ -237,7 +237,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 80802 18728"
+                  placeholder="+91 98765 43210"
                   className="w-full px-4 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-xs font-ui focus:border-[#7D5A34] focus:outline-none"
                 />
               </div>

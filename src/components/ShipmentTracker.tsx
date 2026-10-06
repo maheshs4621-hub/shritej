@@ -219,7 +219,7 @@ export const ShipmentTracker: React.FC<ShipmentTrackerProps> = ({ orders, onBrow
                 <span className="font-bold uppercase tracking-wider text-[#7D5A34] text-[10px] block">Shipping Destination</span>
                 <p className="font-semibold text-[#222E22]">{searchedOrder.customerName}</p>
                 <p className="text-[#594B3C]">{addressString || 'Registered Address'}</p>
-                <p className="text-[#7A6B5B]">Phone: {searchedOrder.customerPhone || '+91 80802 18728'}</p>
+                <p className="text-[#7A6B5B]">Phone: {searchedOrder.customerPhone || 'Not provided'}</p>
                 <p className="text-[#7A6B5B]">Payment Method: <strong>{searchedOrder.paymentMethod}</strong></p>
               </div>
 

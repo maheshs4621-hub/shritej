@@ -151,7 +151,7 @@ export const ContactPage: React.FC = () => {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Mahesh Swami"
+                      placeholder="e.g. Rahul Sharma"
                       className="w-full px-4 py-3 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-sm focus:border-[#7D5A34] focus:outline-none"
                     />
                   </div>
@@ -162,7 +162,7 @@ export const ContactPage: React.FC = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. mahesh@example.com"
+                      placeholder="e.g. yourname@example.com"
                       className="w-full px-4 py-3 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-sm focus:border-[#7D5A34] focus:outline-none"
                     />
                   </div>
@@ -175,7 +175,7 @@ export const ContactPage: React.FC = () => {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+91 80802 18728"
+                      placeholder="+91 98765 43210"
                       className="w-full px-4 py-3 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-sm focus:border-[#7D5A34] focus:outline-none"
                     />
                   </div>

@@ -30,12 +30,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      const enteredName = name.trim();
+      const enteredEmail = email.trim();
       const googleUser: UserProfile = {
         id: 'user-google-' + Date.now(),
-        name: 'Mahesh Swami',
-        email: 'mahesh.s.4621@gmail.com',
+        name: enteredName || (enteredEmail ? enteredEmail.split('@')[0] : 'Patron Member'),
+        email: enteredEmail || 'patron@gmail.com',
+        phone: phone.trim() || undefined,
         provider: 'google',
-        isAdmin: true,
+        isAdmin: enteredEmail.toLowerCase().includes('admin'),
       };
       onLoginSuccess(googleUser);
       onClose();
@@ -52,12 +55,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      const isAdmin = email.toLowerCase().includes('admin') || email.toLowerCase() === 'mahesh.s.4621@gmail.com';
+      const emailPrefix = email.split('@')[0];
+      const formattedPrefix = emailPrefix
+        .replace(/[._]/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const cleanName = name.trim() || formattedPrefix || 'Patron';
+      const isAdmin = email.toLowerCase().includes('admin');
       const user: UserProfile = {
         id: 'user-' + Date.now(),
-        name: name || (isAdmin ? 'Admin Mahesh' : email.split('@')[0]),
-        email,
-        phone: phone || '+91 80802 18728',
+        name: cleanName,
+        email: email.trim(),
+        phone: phone.trim() || undefined,
         provider: 'email',
         isAdmin,
       };
@@ -68,12 +76,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleQuickPatron = () => {
     const user: UserProfile = {
-      id: 'user-patron-1',
-      name: 'Mahesh Swami',
-      email: 'mahesh.s.4621@gmail.com',
-      phone: '+91 80802 18728',
-      provider: 'google',
-      isAdmin: true,
+      id: 'user-patron-guest',
+      name: 'Ayurvedic Patron',
+      email: 'patron@shritejayurveda.com',
+      phone: '+91 98765 43210',
+      provider: 'email',
+      isAdmin: false,
     };
     onLoginSuccess(user);
     onClose();
@@ -191,7 +199,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Mahesh Swami"
+                placeholder="e.g. Rahul Sharma"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none"
               />
             </div>
@@ -204,7 +212,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. mahesh@example.com"
+              placeholder="e.g. yourname@example.com"
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none"
             />
           </div>
@@ -216,7 +224,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 80802 18728"
+                placeholder="+91 98765 43210"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none"
               />
             </div>
