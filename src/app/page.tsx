@@ -307,10 +307,22 @@ export default function ShritejAyurvedaApp() {
     }
   };
 
-  const handleLanguageChange = (lang: Language) => {
+    const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
     try {
       localStorage.setItem('shritej_language', lang);
+      const cookieVal = lang === 'en' ? '/en/en' : '/en/' + lang;
+      document.cookie = 'googtrans=' + cookieVal + '; path=/;';
+      document.cookie = 'googtrans=' + cookieVal + '; path=/; domain=' + window.location.hostname + ';';
+      document.documentElement.lang = lang;
+
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      if (select) {
+        select.value = lang;
+        select.dispatchEvent(new Event('change'));
+      } else {
+        window.location.reload();
+      }
     } catch (e) {}
   };
 

@@ -38,11 +38,26 @@ export const Navbar: React.FC<NavbarProps> = ({
     setCurrentLang(language);
   }, [language]);
 
-  const handleLangSelect = (code: Language) => {
+    const handleLangSelect = (code: Language) => {
     setCurrentLang(code);
     try {
       localStorage.setItem('shritej_language', code);
+      const cookieVal = code === 'en' ? '/en/en' : '/en/' + code;
+      document.cookie = 'googtrans=' + cookieVal + '; path=/;';
+      document.cookie = 'googtrans=' + cookieVal + '; path=/; domain=' + window.location.hostname + ';';
+      document.documentElement.lang = code;
+
+      // Trigger Google Translate dropdown if active
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      if (select) {
+        select.value = code;
+        select.dispatchEvent(new Event('change'));
+      } else {
+        // Full website translation reload
+        window.location.reload();
+      }
     } catch (e) {}
+
     if (onLanguageChange) {
       onLanguageChange(code);
     }
@@ -279,6 +294,32 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             ))}
 
+            {/* App Language Option (English, Hindi, Marathi) - DIRECTLY BELOW CONTACT BAR */}
+            <div className="pt-2 pb-2.5 border-b border-[#EAE1D1] space-y-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-ui uppercase tracking-wider text-[#7D5A34] font-bold">
+                <Globe className="w-3.5 h-3.5 text-[#7D5A34]" />
+                <span>{t.appLanguage} / भाषा निवडा</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 font-ui text-xs">
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => handleLangSelect(l.code)}
+                    className={
+                      'py-2 px-2 rounded-xl border text-center font-bold transition-all shadow-xs flex flex-col items-center justify-center ' +
+                      (currentLang === l.code
+                        ? 'bg-[#2D3E2F] text-white border-[#2D3E2F] shadow-sm ring-1 ring-[#7D5A34]'
+                        : 'bg-[#F4EDE2] text-[#453A2D] border-[#DECDB3] hover:bg-[#EAE0D0]')
+                    }
+                  >
+                    <span className="text-xs font-bold leading-tight">{l.nativeName}</span>
+                    <span className="text-[9px] opacity-75 font-normal mt-0.5">{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* User, Track Order, and Admin Quick Action Buttons */}
             <div className="pt-2 flex flex-wrap items-center gap-2.5">
               {currentUser ? (
@@ -308,32 +349,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <ShieldCheck className="w-3.5 h-3.5" /> {t.admin}
               </button>
-            </div>
-
-            {/* App Language Selector (English, हिंदी, मराठी) */}
-            <div className="pt-4 border-t border-[#EAE1D1] space-y-2.5">
-              <div className="flex items-center gap-1.5 text-[11px] font-ui uppercase tracking-wider text-[#7D5A34] font-bold">
-                <Globe className="w-4 h-4 text-[#7D5A34]" />
-                <span>App Language / भाषा निवडा</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 font-ui text-xs">
-                {LANGUAGES.map((l) => (
-                  <button
-                    key={l.code}
-                    type="button"
-                    onClick={() => handleLangSelect(l.code)}
-                    className={
-                      'py-2.5 px-2 rounded-xl border text-center font-bold transition-all shadow-xs flex flex-col items-center justify-center ' +
-                      (currentLang === l.code
-                        ? 'bg-[#2D3E2F] text-white border-[#2D3E2F] shadow-sm ring-1 ring-[#7D5A34]'
-                        : 'bg-[#F4EDE2] text-[#453A2D] border-[#DECDB3] hover:bg-[#EAE0D0]')
-                    }
-                  >
-                    <span className="text-xs font-bold leading-tight">{l.nativeName}</span>
-                    <span className="text-[9px] opacity-75 font-normal mt-0.5">{l.label}</span>
-                  </button>
-                ))}
-              </div>
             </div>
 
           </div>

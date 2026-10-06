@@ -1,4 +1,4 @@
-﻿import { Language } from '../types';
+import { Language } from '../types';
 
 export const LANGUAGES: { code: Language; label: string; nativeName: string }[] = [
   { code: 'en', label: 'English', nativeName: 'English' },
@@ -28,6 +28,7 @@ export const TRANSLATIONS = {
     myOrders: 'My Orders & Profile',
     liveTracker: 'Live Shipment Tracker',
     adminPortal: 'Super Admin Console',
+
     // Hero Section
     heroBadge: 'SACRED INDIAN HERITAGE & EARTH STEWARDSHIP',
     sanskritTag: '॥ प्रकृतिः रक्षितव्या नित्यम् ॥',
@@ -37,17 +38,47 @@ export const TRANSLATIONS = {
     exploreBtn: 'Explore Formulations',
     storyBtn: 'Our Sacred Story',
     ayurvedaBtn: 'Ayurvedic Wisdom',
-    // Products Section
+
+    // Products & Categories
     sacredApothecary: 'Sacred Apothecary',
     featuredFormulations: 'Featured Ayurvedic Formulations',
     featuredSubtitle: 'Handcrafted with potent botanicals, cold-pressed seed oils, and steam hydrosols inspired by classical Indian wellness.',
-    addToBasket: 'Add',
+    catAll: 'All Formulations',
+    catUbtan: 'Ubtan & Lepa',
+    catRose: 'Pure Rose Waters',
+    catBath: 'Bathing Rituals',
+    catOils: 'Facial Oils',
+    catBoxes: 'Ritual Boxes',
+    addToBasket: 'Add to Basket',
+    add: 'Add',
     buyNow: '⚡ Buy Now',
     soldOut: 'Sold Out',
     inStock: 'In Stock',
     outOfStock: 'Out of Stock',
     viewDetails: 'View Details',
     exploreCatalogue: 'Explore Complete Catalogue',
+    info: 'Info',
+    quantity: 'Quantity',
+    ingredients: 'Ingredients',
+    benefits: 'Ayurvedic Benefits',
+    howToUse: 'How to Use',
+
+    // Cart & Checkout
+    yourBasket: 'Your Sacred Basket',
+    emptyBasket: 'Your basket is currently empty',
+    freeShipping: 'Free Express Shipping Pan-India',
+    subtotal: 'Subtotal',
+    checkout: 'Proceed to Checkout',
+    checkoutTitle: 'Checkout & Delivery',
+    payOnline: 'Pay Online with Razorpay (UPI, Cards, Netbanking)',
+    cashOnDelivery: 'Cash on Delivery',
+    placeOrder: 'Place Order',
+
+    // Tracker
+    trackerTitle: 'Live Shipment Tracker',
+    enterConsignment: 'Enter Consignment ID',
+    trackBtn: 'Track Consignment',
+
     // Footer & Misc
     earthStewardship: 'Zero Unnecessary Plastic • 100% Biodegradable Shipping',
     allRightsReserved: '© 2026 SHRiTEJ AYURVED. Handcrafted in India. Inspired by Classical Traditions.',
@@ -73,6 +104,7 @@ export const TRANSLATIONS = {
     myOrders: 'मेरे ऑर्डर और प्रोफाइल',
     liveTracker: 'लाइव शिपमेंट ट्रैकर',
     adminPortal: 'सुपर एडमिन कंसोल',
+
     // Hero Section
     heroBadge: 'पवित्र भारतीय परंपरा व पर्यावरण रक्षण',
     sanskritTag: '॥ प्रकृतिः रक्षितव्या नित्यम् ॥',
@@ -82,17 +114,47 @@ export const TRANSLATIONS = {
     exploreBtn: 'उत्पाद देखें',
     storyBtn: 'हमारी परंपरा',
     ayurvedaBtn: 'आयुर्वेदिक ज्ञान',
-    // Products Section
+
+    // Products & Categories
     sacredApothecary: 'पवित्र औषधालय',
     featuredFormulations: 'प्रमुख आयुर्वेदिक उत्पाद',
     featuredSubtitle: 'पारंपरिक भारतीय कल्याण से प्रेरित शक्तिशाली वनौषधियों, तेलों और अर्क के साथ हस्तनिर्मित।',
-    addToBasket: 'जोड़ें',
+    catAll: 'सभी उत्पाद',
+    catUbtan: 'उबटन व लेप',
+    catRose: 'शुद्ध गुलाब जल',
+    catBath: 'स्नान विधी',
+    catOils: 'मुख तैल',
+    catBoxes: 'विधी पेटी',
+    addToBasket: 'थैली में जोड़ें',
+    add: 'जोड़ें',
     buyNow: '⚡ अभी खरीदें',
     soldOut: 'स्टॉक समाप्त',
     inStock: 'उपलब्ध है',
     outOfStock: 'स्टॉक समाप्त',
     viewDetails: 'विवरण देखें',
     exploreCatalogue: 'संपूर्ण सूची देखें',
+    info: 'विवरण',
+    quantity: 'मात्रा',
+    ingredients: 'सामग्री',
+    benefits: 'आयुर्वेदिक लाभ',
+    howToUse: 'उपयोग विधि',
+
+    // Cart & Checkout
+    yourBasket: 'आपकी थैली',
+    emptyBasket: 'आपकी थैली खाली है',
+    freeShipping: 'अखिल भारत मोफत एक्सप्रेस शिपिंग',
+    subtotal: 'उप-योग',
+    checkout: 'ऑर्डर करें',
+    checkoutTitle: 'ऑर्डर व पता',
+    payOnline: 'ऑनलाइन भुगतान (रेज़रपे UPI/कार्ड)',
+    cashOnDelivery: 'कैश ऑन डिलीवरी',
+    placeOrder: 'ऑर्डर निश्चित करें',
+
+    // Tracker
+    trackerTitle: 'लाइव शिपमेंट ट्रैकर',
+    enterConsignment: 'कंसाइनमेंट आईडी दर्ज करें',
+    trackBtn: 'ऑर्डर ट्रैक करें',
+
     // Footer & Misc
     earthStewardship: 'शून्य प्लास्टिक • १००% पर्यावरण-अनुकूल पैकेजिंग',
     allRightsReserved: '© २०२६ श्रीतेज आयुर्वेद. भारत में निर्मित. प्राचीन परंपराओं से प्रेरित।',
@@ -118,6 +180,7 @@ export const TRANSLATIONS = {
     myOrders: 'माझे ऑर्डर्स व प्रोफाईल',
     liveTracker: 'थेट शिपमेंट ट्रॅकर',
     adminPortal: 'सुपर ॲडमिन कन्सोल',
+
     // Hero Section
     heroBadge: 'पवित्र भारतीय वारसा व पर्यावरण संवर्धन',
     sanskritTag: '॥ प्रकृतिः रक्षितव्या नित्यम् ॥',
@@ -127,17 +190,47 @@ export const TRANSLATIONS = {
     exploreBtn: 'उत्पादने पहा',
     storyBtn: 'आमची कथा',
     ayurvedaBtn: 'आयुर्वेद तत्त्वज्ञान',
-    // Products Section
+
+    // Products & Categories
     sacredApothecary: 'पवित्र औषधालय',
     featuredFormulations: 'प्रमुख आयुर्वेदिक उत्पादने',
     featuredSubtitle: 'अस्सल भारतीय परंपरेनुसार शुद्ध वनौषधी, तेल आणि अर्क वापरून तयार केलेले.',
-    addToBasket: 'जोडा',
+    catAll: 'सर्व उत्पादने',
+    catUbtan: 'उटणे व लेप',
+    catRose: 'शुद्ध गुलाब पाणी',
+    catBath: 'स्नान विधी',
+    catOils: 'चेहऱ्याचे तेल',
+    catBoxes: 'विधी संच',
+    addToBasket: 'बास्केटमध्ये जोडा',
+    add: 'जोडा',
     buyNow: '⚡ आता खरेदी करा',
     soldOut: 'संपले आहे',
     inStock: 'उपलब्ध आहे',
     outOfStock: 'संपले आहे',
     viewDetails: 'तपशील पहा',
     exploreCatalogue: 'सर्व उत्पादने पहा',
+    info: 'माहिती',
+    quantity: 'प्रमाण',
+    ingredients: 'घटकद्रव्ये',
+    benefits: 'आयुर्वेदिक फायदे',
+    howToUse: 'वापरण्याची पद्धत',
+
+    // Cart & Checkout
+    yourBasket: 'तुमची बास्केट',
+    emptyBasket: 'तुमची बास्केट रिकामी आहे',
+    freeShipping: 'अखिल भारत मोफत एक्सप्रेस डिलिव्हरी',
+    subtotal: 'एकूण रक्कम',
+    checkout: 'खरेदी पूर्ण करा',
+    checkoutTitle: 'पत्ता व ऑर्डर',
+    payOnline: 'ऑनलाइन भरा (रेझरपे UPI/कार्ड)',
+    cashOnDelivery: 'कॅश ऑन डिलिव्हरी',
+    placeOrder: 'ऑर्डर निश्चित करा',
+
+    // Tracker
+    trackerTitle: 'थेट शिपमेंट ट्रॅकर',
+    enterConsignment: 'कन्साइनमेंट आयडी टाका',
+    trackBtn: 'ट्रॅक करा',
+
     // Footer & Misc
     earthStewardship: 'प्लॅस्टिक-मुक्त • १००% नैसर्गिक पर्यावरणपूरक पॅकेजिंग',
     allRightsReserved: '© २०२६ श्रीतेज आयुर्वेद. भारतात तयार केलेले. प्राचीन परंपरांनी प्रेरित.',
