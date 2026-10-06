@@ -1,4 +1,4 @@
-export interface Review {
+﻿export interface Review {
   id: string;
   author: string;
   rating: number;
@@ -101,3 +101,5 @@ export type ViewType =
   | 'shipping-policy'
   | 'returns-policy'
   | 'disclaimer';
+
+export type Language = 'en' | 'hi' | 'mr';

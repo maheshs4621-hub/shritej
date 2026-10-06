@@ -24,7 +24,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2">
                 <span className="font-ui text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full bg-[#EBE0CE] text-[#7D5A34]">{product.category}</span>
-                <span className="font-ui text-xs text-[#7A6B5B]">In Stock: {product.stock} units</span>
+                {product.stock > 0 ? (
+                  <span className="font-ui text-xs text-[#7A6B5B]">In Stock: {product.stock} units</span>
+                ) : (
+                  <span className="font-ui text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full uppercase tracking-wider">Out of Stock</span>
+                )}
               </div>
               <h2 className="font-brand text-xl sm:text-2xl font-bold text-[#222E22] tracking-wider">{product.name}</h2>
               <p className="font-editorial italic text-sm sm:text-base text-[#6E5943]">{product.tagline}</p>
@@ -84,9 +88,15 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
               )}
             </div>
             <div className="pt-3 border-t border-[#EAE1D1]">
-              <button onClick={() => { onAddToCart(product); onClose(); }} className="w-full py-3.5 px-6 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-[#F9F6F0] font-ui text-[11px] sm:text-xs uppercase tracking-[0.2em] font-semibold transition-all shadow-md flex items-center justify-center gap-2">
-                <ShoppingBag className="w-4 h-4" /> Add to Basket (₹{product.price})
-              </button>
+              {product.stock > 0 ? (
+                <button onClick={() => { onAddToCart(product); onClose(); }} className="w-full py-3.5 px-6 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-[#F9F6F0] font-ui text-[11px] sm:text-xs uppercase tracking-[0.2em] font-semibold transition-all shadow-md flex items-center justify-center gap-2">
+                  <ShoppingBag className="w-4 h-4" /> Add to Basket (₹{product.price})
+                </button>
+              ) : (
+                <button disabled className="w-full py-3.5 px-6 rounded-full bg-neutral-200 text-neutral-500 font-ui text-[11px] sm:text-xs uppercase tracking-[0.2em] font-semibold cursor-not-allowed">
+                  Sold Out (Currently Unavailable)
+                </button>
+              )}
             </div>
           </div>
         </div>

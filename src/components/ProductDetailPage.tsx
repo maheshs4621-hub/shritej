@@ -199,38 +199,57 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               {/* Action Controls: Quantity, Add to Cart, Buy Now */}
               <div className="space-y-4 pt-2">
                 <div className="flex items-center gap-4">
-                  <span className="font-ui text-xs font-bold uppercase tracking-wider text-[#45392D]">Quantity:</span>
-                  <div className="flex items-center border border-[#DECDB3] rounded-full bg-[#FAF7F2] p-1">
-                    <button
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="w-8 h-8 rounded-full bg-[#F1E8DC] hover:bg-[#E5DAC8] text-[#3D3226] flex items-center justify-center font-bold text-sm transition-colors"
-                    >
-                      -
-                    </button>
-                    <span className="w-10 text-center font-ui text-sm font-bold text-[#222E22]">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity((q) => q + 1)}
-                      className="w-8 h-8 rounded-full bg-[#F1E8DC] hover:bg-[#E5DAC8] text-[#3D3226] flex items-center justify-center font-bold text-sm transition-colors"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <span className="font-ui text-xs text-[#2D3E2F] font-semibold">✓ In Stock ({product.stock} available)</span>
+                  {product.stock > 0 ? (
+                    <>
+                      <span className="font-ui text-xs font-bold uppercase tracking-wider text-[#45392D]">Quantity:</span>
+                      <div className="flex items-center border border-[#DECDB3] rounded-full bg-[#FAF7F2] p-1">
+                        <button
+                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                          className="w-8 h-8 rounded-full bg-[#F1E8DC] hover:bg-[#E5DAC8] text-[#3D3226] flex items-center justify-center font-bold text-sm transition-colors"
+                        >
+                          -
+                        </button>
+                        <span className="w-10 text-center font-ui text-sm font-bold text-[#222E22]">{quantity}</span>
+                        <button
+                          onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                          className="w-8 h-8 rounded-full bg-[#F1E8DC] hover:bg-[#E5DAC8] text-[#3D3226] flex items-center justify-center font-bold text-sm transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className="font-ui text-xs text-[#2D3E2F] font-semibold">✓ In Stock ({product.stock} available)</span>
+                    </>
+                  ) : (
+                    <span className="font-ui text-xs text-rose-700 font-bold bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                      ✕ Out of Stock (Currently Unavailable)
+                    </span>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <button
-                    onClick={() => onAddToCart(product, quantity)}
-                    className="py-4 px-6 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="w-4 h-4" /> Add to Basket
-                  </button>
-                  <button
-                    onClick={() => onBuyNow(product, quantity)}
-                    className="py-4 px-6 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md text-center"
-                  >
-                    ⚡ Buy Now (₹{product.price * quantity})
-                  </button>
+                  {product.stock > 0 ? (
+                    <>
+                      <button
+                        onClick={() => onAddToCart(product, quantity)}
+                        className="py-4 px-6 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                      >
+                        <ShoppingBag className="w-4 h-4" /> Add to Basket
+                      </button>
+                      <button
+                        onClick={() => onBuyNow(product, quantity)}
+                        className="py-4 px-6 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md text-center"
+                      >
+                        ⚡ Buy Now (₹{product.price * quantity})
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      disabled
+                      className="col-span-full py-4 px-6 rounded-full bg-neutral-200 text-neutral-500 font-ui text-xs uppercase tracking-[0.2em] font-bold cursor-not-allowed text-center"
+                    >
+                      Sold Out / Currently Unavailable
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between pt-1">

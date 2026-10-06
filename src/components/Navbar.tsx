@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, Search, Heart, User, Truck, ShieldCheck, LogIn, ChevronDown, LogOut } from 'lucide-react';
-import { ViewType, UserProfile } from '../types';
+import { ShoppingBag, Menu, X, Search, Heart, User, Truck, ShieldCheck, LogIn, ChevronDown, LogOut, Globe } from 'lucide-react';
+import { ViewType, UserProfile, Language } from '../types';
+import { TRANSLATIONS, LANGUAGES } from '../lib/translations';
 
 interface NavbarProps {
   cartCount: number;
@@ -12,6 +13,8 @@ interface NavbarProps {
   currentUser?: UserProfile | null;
   onOpenAuth?: () => void;
   onLogout?: () => void;
+  language?: Language;
+  onLanguageChange?: (lang: Language) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -24,9 +27,28 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   onOpenAuth,
   onLogout,
+  language = 'en',
+  onLanguageChange,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState<Language>(language);
+
+  React.useEffect(() => {
+    setCurrentLang(language);
+  }, [language]);
+
+  const handleLangSelect = (code: Language) => {
+    setCurrentLang(code);
+    try {
+      localStorage.setItem('shritej_language', code);
+    } catch (e) {}
+    if (onLanguageChange) {
+      onLanguageChange(code);
+    }
+  };
+
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
 
   const handleNavClick = (view: ViewType, category?: string) => {
     onNavigate(view, category);
@@ -36,13 +58,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navLinks: { label: string; view: ViewType }[] = [
-    { label: 'HOME', view: 'home' },
-    { label: 'OUR STORY', view: 'story' },
-    { label: 'AYURVEDA', view: 'ayurveda' },
-    { label: 'PRODUCTS', view: 'products' },
-    { label: 'TRACK ORDER', view: 'track-order' },
-    { label: 'SUSTAINABILITY', view: 'sustainability' },
-    { label: 'CONTACT', view: 'contact' },
+    { label: t.home, view: 'home' },
+    { label: t.story, view: 'story' },
+    { label: t.ayurveda, view: 'ayurveda' },
+    { label: t.products, view: 'products' },
+    { label: t.trackOrder, view: 'track-order' },
+    { label: t.sustainability, view: 'sustainability' },
+    { label: t.contact, view: 'contact' },
   ];
 
   return (
@@ -79,13 +101,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-7 font-ui text-[12px] uppercase tracking-[0.18em] font-semibold text-[#574B3D]">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-6 font-ui text-[12px] uppercase tracking-[0.16em] font-semibold text-[#574B3D]">
           {navLinks.map((item) => (
             <button
               key={item.label}
               onClick={() => handleNavClick(item.view)}
               className={
-                'transition-colors py-1 relative ' +
+                'transition-colors py-1 relative whitespace-nowrap ' +
                 (activeView === item.view
                   ? 'text-[#7D5A34] font-bold after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#7D5A34]'
                   : 'hover:text-[#7D5A34]')
@@ -96,14 +118,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           ))}
         </nav>
 
-        {/* Right Action Icons: Search, User / Auth, Wishlist, Cart */}
+        {/* Right Action Icons: Language, Search, User / Auth, Wishlist, Cart */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           
+          {/* Desktop Language Switcher */}
+          <div className="hidden md:flex items-center rounded-full bg-[#F4EDE2] border border-[#DECDB3] p-0.5 text-xs font-ui font-semibold shadow-xs">
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => handleLangSelect(l.code)}
+                className={
+                  'px-2.5 py-1 rounded-full transition-all text-[11px] font-bold ' +
+                  (currentLang === l.code
+                    ? 'bg-[#2D3E2F] text-white shadow-xs'
+                    : 'text-[#655543] hover:text-[#222E22]')
+                }
+              >
+                {l.nativeName}
+              </button>
+            ))}
+          </div>
+
           {/* Search Icon */}
           <button
             onClick={onSearchOpen}
             className="p-2 sm:p-2.5 rounded-full text-[#524436] hover:text-[#222E22] hover:bg-[#EFE5D6] transition-colors"
-            title="Search formulations"
+            title={t.search}
             aria-label="Search"
           >
             <Search className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -135,20 +176,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => handleNavClick('account')}
                     className="w-full text-left px-4 py-2.5 hover:bg-[#F4EDE2] text-[#453A2E] flex items-center gap-2"
                   >
-                    <User className="w-4 h-4 text-[#7D5A34]" /> My Orders &amp; Profile
+                    <User className="w-4 h-4 text-[#7D5A34]" /> {t.myOrders}
                   </button>
                   <button
                     onClick={() => handleNavClick('track-order')}
                     className="w-full text-left px-4 py-2.5 hover:bg-[#F4EDE2] text-[#453A2E] flex items-center gap-2"
                   >
-                    <Truck className="w-4 h-4 text-[#7D5A34]" /> Live Shipment Tracker
+                    <Truck className="w-4 h-4 text-[#7D5A34]" /> {t.liveTracker}
                   </button>
                   {currentUser.isAdmin && (
                     <button
                       onClick={() => handleNavClick('admin')}
                       className="w-full text-left px-4 py-2.5 hover:bg-[#F4EDE2] text-[#2D3E2F] font-bold flex items-center gap-2 border-t border-[#DECDB3]/60"
                     >
-                      <ShieldCheck className="w-4 h-4 text-[#2D3E2F]" /> Super Admin Console
+                      <ShieldCheck className="w-4 h-4 text-[#2D3E2F]" /> {t.adminPortal}
                     </button>
                   )}
                   <button
@@ -158,7 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     }}
                     className="w-full text-left px-4 py-2.5 hover:bg-rose-50 text-rose-600 flex items-center gap-2 border-t border-[#DECDB3]"
                   >
-                    <LogOut className="w-4 h-4" /> Sign Out
+                    <LogOut className="w-4 h-4" /> {t.signOut}
                   </button>
                 </div>
               )}
@@ -170,7 +211,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Sign in with Google or Email"
             >
               <LogIn className="w-3.5 h-3.5 text-[#7D5A34]" />
-              <span className="hidden sm:inline">Sign In</span>
+              <span className="hidden sm:inline">{t.signIn}</span>
             </button>
           )}
 
@@ -183,7 +224,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ? 'bg-[#EAE0D0] text-[#7D5A34]'
                 : 'text-[#524436] hover:text-[#222E22] hover:bg-[#EFE5D6]')
             }
-            title="Wishlist"
+            title={t.wishlist}
             aria-label="Wishlist"
           >
             <Heart className={'w-4 h-4 sm:w-5 sm:h-5 ' + (wishlistCount > 0 ? 'text-rose-600 fill-rose-600' : '')} />
@@ -201,7 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-label="Shopping Basket"
           >
             <ShoppingBag className="w-4 h-4 text-[#7D5A34]" />
-            <span className="font-ui text-xs tracking-wider uppercase font-semibold hidden md:inline">Basket</span>
+            <span className="font-ui text-xs tracking-wider uppercase font-semibold hidden md:inline">{t.basket}</span>
             {cartCount > 0 && (
               <span className="bg-[#7D5A34] text-white font-ui text-[10px] font-bold h-5 min-w-5 px-1.5 rounded-full flex items-center justify-center animate-pulse">
                 {cartCount}
@@ -237,6 +278,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {item.label}
               </button>
             ))}
+
+            {/* User, Track Order, and Admin Quick Action Buttons */}
             <div className="pt-2 flex flex-wrap items-center gap-2.5">
               {currentUser ? (
                 <button
@@ -250,22 +293,49 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => { setIsMobileMenuOpen(false); if (onOpenAuth) onOpenAuth(); }}
                   className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#2D3E2F] text-white text-xs font-ui uppercase"
                 >
-                  <LogIn className="w-3.5 h-3.5" /> Sign In
+                  <LogIn className="w-3.5 h-3.5" /> {t.signIn}
                 </button>
               )}
               <button
                 onClick={() => handleNavClick('track-order')}
                 className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#F4EDE2] border border-[#DECDB3] text-xs font-ui uppercase"
               >
-                <Truck className="w-3.5 h-3.5 text-[#7D5A34]" /> Track Order
+                <Truck className="w-3.5 h-3.5 text-[#7D5A34]" /> {t.trackOrder}
               </button>
               <button
                 onClick={() => handleNavClick('admin')}
                 className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#F4EDE2] border border-[#DECDB3] text-xs font-ui uppercase text-[#7D5A34]"
               >
-                <ShieldCheck className="w-3.5 h-3.5" /> Admin
+                <ShieldCheck className="w-3.5 h-3.5" /> {t.admin}
               </button>
             </div>
+
+            {/* App Language Selector (English, हिंदी, मराठी) */}
+            <div className="pt-4 border-t border-[#EAE1D1] space-y-2.5">
+              <div className="flex items-center gap-1.5 text-[11px] font-ui uppercase tracking-wider text-[#7D5A34] font-bold">
+                <Globe className="w-4 h-4 text-[#7D5A34]" />
+                <span>App Language / भाषा निवडा</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 font-ui text-xs">
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => handleLangSelect(l.code)}
+                    className={
+                      'py-2.5 px-2 rounded-xl border text-center font-bold transition-all shadow-xs flex flex-col items-center justify-center ' +
+                      (currentLang === l.code
+                        ? 'bg-[#2D3E2F] text-white border-[#2D3E2F] shadow-sm ring-1 ring-[#7D5A34]'
+                        : 'bg-[#F4EDE2] text-[#453A2D] border-[#DECDB3] hover:bg-[#EAE0D0]')
+                    }
+                  >
+                    <span className="text-xs font-bold leading-tight">{l.nativeName}</span>
+                    <span className="text-[9px] opacity-75 font-normal mt-0.5">{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       )}

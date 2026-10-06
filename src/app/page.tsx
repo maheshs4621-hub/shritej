@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Product, CartItem, Order, ViewType, UserProfile } from '../types';
+import { Product, CartItem, Order, ViewType, UserProfile, Language } from '../types';
 import { INITIAL_PRODUCTS } from '../initialData';
 import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
@@ -31,6 +31,7 @@ import { ShipmentTracker } from '../components/ShipmentTracker';
 import { SplashScreen } from '../components/SplashScreen';
 import { AuthModal } from '../components/AuthModal';
 import { Footer } from '../components/Footer';
+import { TRANSLATIONS } from '../lib/translations';
 import { Check, ArrowRight, Star, ShieldCheck, Mail, Send, ChevronRight, Truck, Sparkles } from 'lucide-react';
 
 export default function ShritejAyurvedaApp() {
@@ -41,6 +42,7 @@ export default function ShritejAyurvedaApp() {
   
   // Auth & User State
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [language, setLanguage] = useState<Language>('en');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Splash Screen State
@@ -83,6 +85,8 @@ export default function ShritejAyurvedaApp() {
       if (o) setOrders(JSON.parse(o));
       const u = localStorage.getItem('shritej_user');
       if (u) setCurrentUser(JSON.parse(u));
+      const l = localStorage.getItem('shritej_language') as Language;
+      if (l && (l === 'en' || l === 'hi' || l === 'mr')) setLanguage(l);
       const a = localStorage.getItem('shritej_announcement');
       if (a) setAnnouncementText(a);
     } catch (e) {}
@@ -303,14 +307,20 @@ export default function ShritejAyurvedaApp() {
     }
   };
 
+  const handleLanguageChange = (lang: Language) => {
+    setLanguage(lang);
+    try {
+      localStorage.setItem('shritej_language', lang);
+    } catch (e) {}
+  };
+
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
+
   return (
     <div className="min-h-screen bg-[#F8F5EE] text-[#2C2723] flex flex-col justify-between selection:bg-[#C9A24D]/30">
       <div>
         
-        {/* Top Storewide Announcement Banner */}
-        <div className="bg-[#2D3E2F] text-[#FAF7F2] py-2 px-4 text-center font-ui text-[10px] sm:text-[11px] tracking-widest uppercase font-semibold flex items-center justify-center gap-2 border-b border-[#3D523F]">
-          <span>{announcementText}</span>
-        </div>
+        
 
         {/* Sticky Header / Navigation */}
         <Navbar
@@ -323,6 +333,8 @@ export default function ShritejAyurvedaApp() {
           currentUser={currentUser}
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onLogout={handleLogout}
+          language={language}
+          onLanguageChange={handleLanguageChange}
         />
 
         {/* Order Placed Confirmation Toast / Banner */}
@@ -387,19 +399,20 @@ export default function ShritejAyurvedaApp() {
               onExplore={() => handleNavigate('products')}
               onStory={() => handleNavigate('story')}
               onAyurveda={() => handleNavigate('ayurveda')}
+              language={language}
             />
 
             <section className="py-20 sm:py-28 bg-[#FAF7F2] border-b border-[#E3DAC8]">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
-                    Sacred Apothecary
+                    {t.sacredApothecary}
                   </span>
                   <h2 className="font-brand text-3xl sm:text-5xl font-bold tracking-[0.06em] text-[#202E22]">
-                    Featured Ayurvedic Formulations
+                    {t.featuredFormulations}
                   </h2>
                   <p className="font-editorial text-lg sm:text-xl text-[#594B3C] max-w-2xl mx-auto leading-relaxed">
-                    Handcrafted with potent botanicals, cold-pressed seed oils, and steam hydrosols inspired by classical Indian wellness.
+                    {t.featuredSubtitle}
                   </p>
                   <div className="w-16 h-0.5 bg-[#8E6E45] mx-auto mt-2"></div>
                 </div>
