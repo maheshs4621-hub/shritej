@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, Mail, Lock, User, Phone, Eye, EyeOff, ShieldCheck, ArrowRight, CheckCircle2, KeyRound, Sparkles, RefreshCw } from 'lucide-react';
+import { X, Mail, Lock, User, Phone, Eye, EyeOff, ShieldCheck, ArrowRight, CheckCircle2, KeyRound, Sparkles, RefreshCw, UserPlus } from 'lucide-react';
 import { UserProfile } from '../types';
 import {
   registerNewPatron,
   verifyPatronCredentials,
-  createOrGetPatronByPhone,
   patronToUserProfile,
-  findPatronByPhone
+  findPatronByPhone,
+  findPatronByIdentifier
 } from '../utils/patronAuth';
 
 interface AuthModalProps {
@@ -50,6 +50,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [needsRegistrationPrompt, setNeedsRegistrationPrompt] = useState(false);
 
   // Countdown timer for OTP
   useEffect(() => {
@@ -65,6 +66,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const resetMessages = () => {
     setError('');
     setSuccessMsg('');
+    setNeedsRegistrationPrompt(false);
+  };
+
+  const handleGoToRegister = () => {
+    resetMessages();
+    setTab('signup');
+    // If they typed a phone or email during sign in attempt, prefill it!
+    if (signinMode === 'otp' && otpPhone) {
+      setPhone(otpPhone);
+    } else if (identifier) {
+      if (identifier.includes('@')) {
+        setEmail(identifier);
+      } else if (/^\d{10}$/.test(identifier.replace(/\D/g, ''))) {
+        setPhone(identifier.replace(/\D/g, ''));
+      }
+    }
   };
 
   // 1. Password-based Sign In Handler
@@ -78,6 +95,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
     if (!loginPassword) {
       setError('Please enter your account password.');
+      return;
+    }
+
+    // Strict Check: Must already be registered!
+    const existing = findPatronByIdentifier(identifier);
+    if (!existing) {
+      setError(`Account "${identifier}" is not registered yet. First-time patrons must Register first before signing in.`);
+      setNeedsRegistrationPrompt(true);
       return;
     }
 
@@ -96,7 +121,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }, 400);
   };
 
-  // 2. Mobile OTP - Send OTP Handler
+  // 2. Mobile OTP - Send OTP Handler (STRICT: ONLY IF ALREADY REGISTERED)
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     resetMessages();
@@ -107,10 +132,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
+    // Strict Check: Only already registered numbers can receive sign-in OTP!
+    const registeredPatron = findPatronByPhone(clean);
+    if (!registeredPatron) {
+      setError(`Mobile number +91 ${clean} is not registered yet. First-time patrons must Register first before signing in.`);
+      setNeedsRegistrationPrompt(true);
+      return;
+    }
+
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      // Generate authentic 6-digit OTP code
+      // Generate authentic 6-digit OTP code for the registered patron
       const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
       setActiveOtp(generatedCode);
       setOtpSent(true);
@@ -119,7 +152,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       const notificationText = `🔔 SMS OTP Sent to +91 ${clean}: Your Sacred Login Code is [${generatedCode}] (Valid for 5 mins)`;
       setOtpNotification(notificationText);
-      setSuccessMsg(`OTP sent successfully to +91 ${clean}! Enter code below.`);
+      setSuccessMsg(`OTP sent to registered mobile +91 ${clean}! Enter code below.`);
     }, 500);
   };
 
@@ -139,11 +172,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
+    const cleanPhone = otpPhone.replace(/\D/g, '').slice(-10);
+    const registeredPatron = findPatronByPhone(cleanPhone);
+    if (!registeredPatron) {
+      setError('Account not found. First-time patrons must Register first.');
+      setNeedsRegistrationPrompt(true);
+      return;
+    }
+
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      const patron = createOrGetPatronByPhone(otpPhone);
-      const user = patronToUserProfile(patron, 'phone');
+      const user = patronToUserProfile(registeredPatron, 'phone');
       onLoginSuccess(user);
       onClose();
     }, 400);
@@ -268,7 +308,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {tab === 'signin' ? 'Welcome Back' : 'Create Sacred Account'}
           </h2>
           <p className="font-editorial text-xs text-[#6A5947]">
-            Join the SHRiTEJ Ayurvedic patron sanctuary
+            {tab === 'signin'
+              ? 'Sign in to your registered patron account'
+              : 'First-time patrons: Register once with your password'}
           </p>
         </div>
 
@@ -292,7 +334,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               (tab === 'signup' ? 'bg-[#2D3E2F] text-white shadow-sm' : 'text-[#554636] hover:text-[#222E22]')
             }
           >
-            Register
+            Register First
           </button>
         </div>
 
@@ -309,9 +351,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error / Success Alerts */}
         {error && (
-          <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 p-2.5 rounded-xl mb-3 text-center font-ui font-medium">
-            {error}
-          </p>
+          <div className="space-y-2 mb-3">
+            <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 p-2.5 rounded-xl text-center font-ui font-medium">
+              {error}
+            </p>
+            {needsRegistrationPrompt && (
+              <button
+                type="button"
+                onClick={handleGoToRegister}
+                className="w-full py-2.5 px-4 rounded-xl bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-xs uppercase font-bold tracking-wider transition-colors flex items-center justify-center gap-2 shadow-sm"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Register Account Now</span>
+              </button>
+            )}
+          </div>
         )}
         {successMsg && !otpNotification && (
           <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl mb-3 text-center font-ui font-medium">
@@ -320,7 +374,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         )}
 
         {/* =========================================
-            SIGN IN SECTION
+            SIGN IN SECTION (ONLY FOR REGISTERED PATRONS)
            ========================================= */}
         {tab === 'signin' ? (
           <div>
@@ -359,13 +413,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <form onSubmit={handlePasswordSignIn} className="space-y-3.5 font-ui text-xs">
                 <div>
                   <label className="block font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">
-                    Email Address or Mobile Number *
+                    Registered Email or Mobile Number *
                   </label>
                   <input
                     required
                     type="text"
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
+                    onChange={(e) => { setIdentifier(e.target.value); resetMessages(); }}
                     placeholder="e.g. patron@gmail.com or 9876543210"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none"
                   />
@@ -389,7 +443,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       required
                       type={showPassword ? 'text' : 'password'}
                       value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
+                      onChange={(e) => { setLoginPassword(e.target.value); resetMessages(); }}
                       placeholder="Enter registered password"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none pr-10"
                     />
@@ -411,6 +465,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   {isLoading ? 'Verifying Credentials...' : 'Sign In to Account'}
                   <ArrowRight className="w-4 h-4" />
                 </button>
+
+                <p className="text-center text-[11px] text-[#695A48] pt-1">
+                  First time visiting SHRiTEJ?{' '}
+                  <button
+                    type="button"
+                    onClick={handleGoToRegister}
+                    className="font-bold text-[#7D5A34] hover:underline"
+                  >
+                    Register your account first
+                  </button>
+                </p>
               </form>
             ) : (
               /* B. Sign In with Mobile Number & OTP */
@@ -419,7 +484,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <form onSubmit={handleSendOtp} className="space-y-3.5 font-ui text-xs">
                     <div>
                       <label className="block font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">
-                        10-Digit Mobile Number *
+                        Registered 10-Digit Mobile Number *
                       </label>
                       <div className="flex gap-2">
                         <span className="px-3 py-2.5 bg-[#EAE0D0] border border-[#DECDB3] rounded-xl font-bold text-xs text-[#4E3922] flex items-center">
@@ -430,13 +495,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           type="tel"
                           maxLength={10}
                           value={otpPhone}
-                          onChange={(e) => setOtpPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                          onChange={(e) => {
+                            setOtpPhone(e.target.value.replace(/\D/g, '').slice(0, 10));
+                            resetMessages();
+                          }}
                           placeholder="98765 43210"
                           className="flex-1 px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none font-mono"
                         />
                       </div>
                       <p className="text-[10px] text-[#7A6B5B] mt-1">
-                        We will send a 6-digit verification code to your phone.
+                        Must be previously registered. We will send a 6-digit code to verify your identity.
                       </p>
                     </div>
 
@@ -445,15 +513,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       disabled={isLoading}
                       className="w-full py-3.5 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-xs uppercase tracking-[0.2em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      {isLoading ? 'Dispatching OTP...' : 'Send Sacred OTP Code'}
+                      {isLoading ? 'Checking Registration...' : 'Send Sacred OTP Code'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
+
+                    <p className="text-center text-[11px] text-[#695A48] pt-1">
+                      Not registered yet?{' '}
+                      <button
+                        type="button"
+                        onClick={handleGoToRegister}
+                        className="font-bold text-[#7D5A34] hover:underline"
+                      >
+                        Register your account first
+                      </button>
+                    </p>
                   </form>
                 ) : (
                   <form onSubmit={handleVerifyOtp} className="space-y-3.5 font-ui text-xs">
                     <div className="p-3 bg-[#F2E8D7] rounded-xl border border-[#DECDB3] flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-[#7D5A34] block">Sending code to:</span>
+                        <span className="text-[10px] uppercase font-bold text-[#7D5A34] block">Registered mobile:</span>
                         <span className="font-mono text-xs font-bold text-[#222E22]">+91 {otpPhone}</span>
                       </div>
                       <button
@@ -511,9 +590,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         ) : (
           /* =========================================
-              REGISTER SECTION (Strict Persistent Passwords)
+              REGISTER FIRST SECTION (Mandatory for First-Comers)
              ========================================= */
           <form onSubmit={handleSignUp} className="space-y-3 font-ui text-xs">
+            <div className="p-3 bg-[#EFE6D6] rounded-2xl border border-[#D5C2A4] mb-1">
+              <span className="font-ui text-[10px] uppercase font-bold text-[#7D5A34] tracking-wider block">
+                Patron Registration
+              </span>
+              <p className="text-[11px] text-[#554636] mt-0.5">
+                First-time patrons must register once with their name, mobile, and password.
+              </p>
+            </div>
+
             <div>
               <label className="block font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">
                 Full Name *
@@ -572,7 +660,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create a strong password"
+                  placeholder="Create your sacred password"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none pr-10"
                 />
                 <button
@@ -613,9 +701,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               disabled={isLoading}
               className="w-full py-3.5 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-xs uppercase tracking-[0.2em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
             >
-              {isLoading ? 'Creating Account...' : 'Register Sacred Account'}
+              {isLoading ? 'Creating Account...' : 'Complete Sacred Registration'}
               <ArrowRight className="w-4 h-4" />
             </button>
+
+            <p className="text-center text-[11px] text-[#695A48] pt-1">
+              Already registered?{' '}
+              <button
+                type="button"
+                onClick={() => { setTab('signin'); resetMessages(); }}
+                className="font-bold text-[#7D5A34] hover:underline"
+              >
+                Sign in here
+              </button>
+            </p>
           </form>
         )}
 

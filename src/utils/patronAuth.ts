@@ -49,6 +49,33 @@ export function saveRegisteredPatrons(patrons: RegisteredPatron[]): void {
   } catch (e) {}
 }
 
+export function findPatronByIdentifier(identifier: string): RegisteredPatron | undefined {
+  const patrons = getRegisteredPatrons();
+  const cleanId = identifier.trim().toLowerCase();
+  const cleanDigits = identifier.replace(/\D/g, '').slice(-10);
+
+  return patrons.find((p) => {
+    const pEmail = p.email.toLowerCase();
+    const pPhone = p.phone.replace(/\D/g, '').slice(-10);
+    return pEmail === cleanId || (cleanDigits.length >= 10 && pPhone === cleanDigits);
+  });
+}
+
+export function findPatronByPhone(phoneInput: string): RegisteredPatron | undefined {
+  const patrons = getRegisteredPatrons();
+  const cleanDigits = phoneInput.replace(/\D/g, '').slice(-10);
+  if (cleanDigits.length !== 10) return undefined;
+  return patrons.find((p) => p.phone.replace(/\D/g, '').slice(-10) === cleanDigits);
+}
+
+export function isIdentifierRegistered(identifier: string): boolean {
+  return !!findPatronByIdentifier(identifier);
+}
+
+export function isPhoneRegistered(phoneInput: string): boolean {
+  return !!findPatronByPhone(phoneInput);
+}
+
 export function registerNewPatron(data: {
   name: string;
   email: string;
@@ -62,14 +89,14 @@ export function registerNewPatron(data: {
   if (patrons.some((p) => p.email.toLowerCase() === cleanEmail)) {
     return {
       success: false,
-      error: 'An account with this email address already exists. Please sign in with your password or Mobile OTP.',
+      error: 'An account with this email address is already registered. Please sign in with your password or Mobile OTP.',
     };
   }
 
   if (cleanPhone.length === 10 && patrons.some((p) => p.phone.replace(/\D/g, '').slice(-10) === cleanPhone)) {
     return {
       success: false,
-      error: 'An account with this mobile number already exists. Please sign in with your password or Mobile OTP.',
+      error: 'An account with this mobile number is already registered. Please sign in with your password or Mobile OTP.',
     };
   }
 
@@ -93,20 +120,12 @@ export function verifyPatronCredentials(
   identifier: string,
   passwordInput: string
 ): { success: boolean; patron?: RegisteredPatron; error?: string } {
-  const patrons = getRegisteredPatrons();
-  const cleanId = identifier.trim().toLowerCase();
-  const cleanDigits = identifier.replace(/\D/g, '').slice(-10);
-
-  const matched = patrons.find((p) => {
-    const pEmail = p.email.toLowerCase();
-    const pPhone = p.phone.replace(/\D/g, '').slice(-10);
-    return pEmail === cleanId || (cleanDigits.length >= 10 && pPhone === cleanDigits);
-  });
+  const matched = findPatronByIdentifier(identifier);
 
   if (!matched) {
     return {
       success: false,
-      error: 'No account found with this email or mobile number. Please check your credentials or Register a new account.',
+      error: 'This account is not registered yet. First-time patrons must Register first.',
     };
   }
 
@@ -118,35 +137,6 @@ export function verifyPatronCredentials(
   }
 
   return { success: true, patron: matched };
-}
-
-export function findPatronByPhone(phoneInput: string): RegisteredPatron | undefined {
-  const patrons = getRegisteredPatrons();
-  const cleanDigits = phoneInput.replace(/\D/g, '').slice(-10);
-  if (!cleanDigits) return undefined;
-  return patrons.find((p) => p.phone.replace(/\D/g, '').slice(-10) === cleanDigits);
-}
-
-export function createOrGetPatronByPhone(phoneInput: string, name?: string): RegisteredPatron {
-  const patrons = getRegisteredPatrons();
-  const cleanDigits = phoneInput.replace(/\D/g, '').slice(-10);
-
-  const existing = patrons.find((p) => p.phone.replace(/\D/g, '').slice(-10) === cleanDigits);
-  if (existing) return existing;
-
-  const newPatron: RegisteredPatron = {
-    id: 'patron-otp-' + Date.now(),
-    name: name?.trim() || `Patron ${cleanDigits.slice(-4)}`,
-    email: `patron${cleanDigits}@shritejayurveda.com`,
-    phone: cleanDigits,
-    password: 'otp_verified_' + Date.now(),
-    createdAt: new Date().toISOString(),
-    isAdmin: false,
-  };
-
-  patrons.push(newPatron);
-  saveRegisteredPatrons(patrons);
-  return newPatron;
 }
 
 export function patronToUserProfile(patron: RegisteredPatron, provider: 'email' | 'phone' | 'google' = 'email'): UserProfile {
