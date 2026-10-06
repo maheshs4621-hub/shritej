@@ -6,11 +6,7 @@ import { Product, CartItem, Order, ViewType, UserProfile, Language } from '../ty
 import { INITIAL_PRODUCTS } from '../initialData';
 import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
-import { BrandStory } from '../components/BrandStory';
-import { PhilosophySection } from '../components/PhilosophySection';
-import { SustainablePackaging } from '../components/SustainablePackaging';
-import { TraditionalMethods } from '../components/TraditionalMethods';
-import { AuthenticitySection } from '../components/AuthenticitySection';
+import { HeritageShowcase } from '../components/HeritageShowcase';
 import { ProductCard } from '../components/ProductCard';
 import { ProductsPage } from '../components/ProductsPage';
 import { ProductDetailPage } from '../components/ProductDetailPage';
@@ -436,38 +432,14 @@ export default function ShritejAyurvedaApp() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {products.slice(0, 3).map((prod) => (
-                    <div key={prod.id} className="flex flex-col">
-                      <ProductCard
-                        product={prod}
-                        onAddToCart={handleAddToCart}
-                        onViewDetails={handleQuickView}
-                        isWishlisted={wishlist.includes(prod.id)}
-                        onToggleWishlist={handleToggleWishlist}
-                      />
-                      <div className="mt-2.5 flex items-center gap-2">
-                        {prod.stock > 0 ? (
-                          <button
-                            onClick={() => handleBuyNow(prod)}
-                            className="flex-1 py-2 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-bold transition-all shadow-sm text-center"
-                          >
-                            âš¡ Buy Now
-                          </button>
-                        ) : (
-                          <button
-                            disabled
-                            className="flex-1 py-2 rounded-full bg-neutral-200 text-neutral-500 font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-center cursor-not-allowed"
-                          >
-                            Sold Out
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleOpenProductDetail(prod)}
-                          className="px-4 py-2 rounded-full border border-[#B5A187] hover:border-[#7D5A34] text-[#473A2D] font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold hover:bg-[#FAF7F2] transition-all"
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </div>
+                    <ProductCard
+                      key={prod.id}
+                      product={prod}
+                      onAddToCart={handleAddToCart}
+                      onViewDetails={handleQuickView}
+                      isWishlisted={wishlist.includes(prod.id)}
+                      onToggleWishlist={handleToggleWishlist}
+                    />
                   ))}
                 </div>
 
@@ -482,32 +454,10 @@ export default function ShritejAyurvedaApp() {
               </div>
             </section>
 
-            <BrandStory />
-            <PhilosophySection />
-
-            <section className="py-16 bg-[#F4EDE2] border-b border-[#DECDB3]">
-              <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
-                <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
-                  Vedic Living
-                </span>
-                <h3 className="font-brand text-2xl sm:text-4xl font-bold text-[#222E22]">
-                  The Living Wisdom of Tridoshas
-                </h3>
-                <p className="font-editorial text-lg text-[#594B3C] max-w-xl mx-auto">
-                  Learn how authentic Ayurveda balances Vata, Pitta, and Kapha energies through mindful daily rituals.
-                </p>
-                <button
-                  onClick={() => handleNavigate('ayurveda')}
-                  className="mt-2 px-7 py-3.5 rounded-full border border-[#7D5A34] text-[#4E3922] font-ui text-xs uppercase tracking-[0.2em] font-bold hover:bg-[#EAE0D0] transition-all inline-flex items-center gap-2"
-                >
-                  Discover Ayurveda <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </section>
-
-            <SustainablePackaging />
-            <TraditionalMethods />
-            <AuthenticitySection />
+            <HeritageShowcase
+              onExplore={() => handleNavigate('products')}
+              onDiscoverAyurveda={() => handleNavigate('ayurveda')}
+            />
 
             <section className="py-20 bg-[#FAF7F2] border-b border-[#DECDB3]">
               <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">

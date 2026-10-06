@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, Lock, ShieldCheck, ArrowRight, Truck, CreditCard, Smartphone, Check } from 'lucide-react';
+import { X, CheckCircle2, Lock, ShieldCheck, ArrowRight, Truck, CreditCard, Smartphone, Check, Sparkles, Tag } from 'lucide-react';
 import { CartItem } from '../types';
 
 interface CheckoutModalProps {
@@ -28,6 +28,54 @@ declare global {
   }
 }
 
+const lookupIndianPincode = (pin: string): { city?: string; state: string } | null => {
+  const p = pin.trim();
+  if (p.length !== 6 || !/^\d{6}$/.test(p)) return null;
+  const num = parseInt(p, 10);
+  const prefix2 = parseInt(p.substring(0, 2), 10);
+
+  if (num >= 400001 && num <= 400104) return { city: 'Mumbai', state: 'Maharashtra' };
+  if (num >= 411001 && num <= 411065) return { city: 'Pune', state: 'Maharashtra' };
+  if (num >= 416001 && num <= 416020) return { city: 'Kolhapur', state: 'Maharashtra' };
+  if (num >= 440001 && num <= 440040) return { city: 'Nagpur', state: 'Maharashtra' };
+  if (num >= 431001 && num <= 431015) return { city: 'Chhatrapati Sambhajinagar', state: 'Maharashtra' };
+  if (num >= 422001 && num <= 422015) return { city: 'Nashik', state: 'Maharashtra' };
+  if (num >= 413001 && num <= 413010) return { city: 'Solapur', state: 'Maharashtra' };
+  if (num >= 110001 && num <= 110096) return { city: 'New Delhi', state: 'Delhi' };
+  if (num >= 560001 && num <= 560110) return { city: 'Bengaluru', state: 'Karnataka' };
+  if (num >= 500001 && num <= 500095) return { city: 'Hyderabad', state: 'Telangana' };
+  if (num >= 600001 && num <= 600120) return { city: 'Chennai', state: 'Tamil Nadu' };
+  if (num >= 700001 && num <= 700105) return { city: 'Kolkata', state: 'West Bengal' };
+  if (num >= 380001 && num <= 380060) return { city: 'Ahmedabad', state: 'Gujarat' };
+  if (num >= 302001 && num <= 302040) return { city: 'Jaipur', state: 'Rajasthan' };
+  if (num >= 226001 && num <= 226030) return { city: 'Lucknow', state: 'Uttar Pradesh' };
+  if (num >= 160001 && num <= 160070) return { city: 'Chandigarh', state: 'Chandigarh' };
+  if (num >= 682001 && num <= 682045) return { city: 'Kochi', state: 'Kerala' };
+  if (num >= 452001 && num <= 452020) return { city: 'Indore', state: 'Madhya Pradesh' };
+
+  if (prefix2 === 11) return { state: 'Delhi' };
+  if (prefix2 >= 12 && prefix2 <= 13) return { state: 'Haryana' };
+  if (prefix2 >= 14 && prefix2 <= 16) return { state: 'Punjab' };
+  if (prefix2 === 17) return { state: 'Himachal Pradesh' };
+  if (prefix2 >= 18 && prefix2 <= 19) return { state: 'Jammu & Kashmir' };
+  if (prefix2 >= 20 && prefix2 <= 28) return { state: 'Uttar Pradesh' };
+  if (prefix2 >= 30 && prefix2 <= 34) return { state: 'Rajasthan' };
+  if (prefix2 >= 36 && prefix2 <= 39) return { state: 'Gujarat' };
+  if (prefix2 >= 40 && prefix2 <= 44) return { state: 'Maharashtra' };
+  if (prefix2 >= 45 && prefix2 <= 48) return { state: 'Madhya Pradesh' };
+  if (prefix2 === 49) return { state: 'Chhattisgarh' };
+  if (prefix2 >= 50 && prefix2 <= 53) return { state: 'Telangana / Andhra Pradesh' };
+  if (prefix2 >= 56 && prefix2 <= 59) return { state: 'Karnataka' };
+  if (prefix2 >= 60 && prefix2 <= 64) return { state: 'Tamil Nadu' };
+  if (prefix2 >= 67 && prefix2 <= 69) return { state: 'Kerala' };
+  if (prefix2 >= 70 && prefix2 <= 74) return { state: 'West Bengal' };
+  if (prefix2 >= 75 && prefix2 <= 77) return { state: 'Odisha' };
+  if (prefix2 >= 80 && prefix2 <= 85) return { state: 'Bihar / Jharkhand' };
+  if (prefix2 >= 78 && prefix2 <= 79) return { state: 'Assam / North East' };
+
+  return null;
+};
+
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isOpen,
   onClose,
@@ -47,6 +95,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
+  // 1-Tap Coupon Privilege
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (window.Razorpay) {
@@ -64,7 +116,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   if (!isOpen) return null;
 
   const subtotal = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
-  const total = subtotal;
+  const discountAmount = Math.round(subtotal * appliedDiscount);
+  const total = Math.max(0, subtotal - discountAmount);
+
+  const handlePincodeChange = (val: string) => {
+    const cleaned = val.replace(/\D/g, '').slice(0, 6);
+    setPincode(cleaned);
+    if (cleaned.length === 6) {
+      const match = lookupIndianPincode(cleaned);
+      if (match) {
+        setState(match.state);
+        if (match.city && (!city || city === 'Pune')) {
+          setCity(match.city);
+        }
+      }
+    }
+  };
 
   const handleProcessOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -272,6 +339,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
+                <label className="block font-ui font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">PIN Code (Auto-Detects) *</label>
+                <input
+                  required
+                  type="text"
+                  maxLength={6}
+                  value={pincode}
+                  onChange={(e) => handlePincodeChange(e.target.value)}
+                  placeholder="e.g. 411001"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-xs font-ui focus:border-[#7D5A34] focus:outline-none font-mono"
+                />
+              </div>
+              <div>
                 <label className="block font-ui font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">City *</label>
                 <input
                   required
@@ -290,18 +369,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                   placeholder="Maharashtra"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-xs font-ui focus:border-[#7D5A34] focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block font-ui font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">PIN Code *</label>
-                <input
-                  required
-                  type="text"
-                  maxLength={6}
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  placeholder="411001"
                   className="w-full px-4 py-2.5 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-[#222E22] text-xs font-ui focus:border-[#7D5A34] focus:outline-none"
                 />
               </div>
@@ -354,11 +421,63 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </div>
           </div>
 
+          {/* 1-Tap Ritual Privilege Offers */}
+          <div className="space-y-2 pt-2 border-t border-[#DECDB3]">
+            <div className="flex items-center justify-between text-xs font-ui">
+              <span className="font-bold uppercase tracking-wider text-[#7D5A34] text-[10px] flex items-center gap-1">
+                <Tag className="w-3 h-3" /> Patron Privilege Offers
+              </span>
+              {appliedDiscount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => { setAppliedDiscount(0); setCouponCode(''); }}
+                  className="text-[10px] text-rose-700 font-bold hover:underline"
+                >
+                  Remove Offer
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => { setAppliedDiscount(0.10); setCouponCode('AYURVEDA10'); }}
+                className={
+                  'px-3 py-1.5 rounded-full font-ui text-[11px] font-semibold border transition-all flex items-center gap-1.5 ' +
+                  (couponCode === 'AYURVEDA10'
+                    ? 'bg-[#2D3E2F] text-white border-[#2D3E2F] shadow-sm'
+                    : 'bg-[#F4EDE2] hover:bg-[#EAE0D0] text-[#473A2D] border-[#DECDB3]')
+                }
+              >
+                <span>AYURVEDA10</span>
+                <span className="text-[10px] opacity-80">(10% Off)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAppliedDiscount(0.15); setCouponCode('FIRSTCARE'); }}
+                className={
+                  'px-3 py-1.5 rounded-full font-ui text-[11px] font-semibold border transition-all flex items-center gap-1.5 ' +
+                  (couponCode === 'FIRSTCARE'
+                    ? 'bg-[#2D3E2F] text-white border-[#2D3E2F] shadow-sm'
+                    : 'bg-[#F4EDE2] hover:bg-[#EAE0D0] text-[#473A2D] border-[#DECDB3]')
+                }
+              >
+                <span>FIRSTCARE</span>
+                <span className="text-[10px] opacity-80">(15% Off)</span>
+              </button>
+            </div>
+          </div>
+
           <div className="p-4 bg-[#F3ECE0] rounded-2xl border border-[#DECDB3] space-y-2 font-ui text-xs">
             <div className="flex justify-between text-[#594B3C]">
               <span>Cart Subtotal ({cart.reduce((s, i) => s + i.quantity, 0)} formulations)</span>
               <strong className="text-[#222E22]">₹{subtotal}</strong>
             </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-emerald-800 font-semibold">
+                <span>Sacred Privilege ({couponCode})</span>
+                <span>-₹{discountAmount}</span>
+              </div>
+            )}
             <div className="flex justify-between text-[#594B3C]">
               <span>Plastic-Free Express Courier</span>
               <strong className="text-[#2D3E2F]">FREE</strong>
@@ -383,6 +502,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             )}
             <ArrowRight className="w-4 h-4" />
           </button>
+
+          {/* Trust Guarantee Ribbon */}
+          <div className="pt-1 grid grid-cols-3 gap-2 text-center font-ui text-[10px] text-[#695A48]">
+            <div className="flex items-center justify-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#2D3E2F]" />
+              <span>256-Bit SSL</span>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <Truck className="w-3.5 h-3.5 text-[#7D5A34]" />
+              <span>Express Transit</span>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <Lock className="w-3.5 h-3.5 text-[#2D3E2F]" />
+              <span>Razorpay Verified</span>
+            </div>
+          </div>
         </form>
 
       </div>

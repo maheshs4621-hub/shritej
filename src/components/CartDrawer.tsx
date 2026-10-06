@@ -1,5 +1,5 @@
-﻿import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Tag, Check, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Tag, Check, ShieldCheck, Truck, Sparkles, Lock, Leaf, Package } from 'lucide-react';
 import { CartItem } from '../types';
 
 interface CartDrawerProps {
@@ -12,6 +12,8 @@ interface CartDrawerProps {
   onBrowseCatalogue: () => void;
 }
 
+const FREE_SHIPPING_THRESHOLD = 999;
+
 export const CartDrawer: React.FC<CartDrawerProps> = ({
   isOpen,
   onClose,
@@ -19,7 +21,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onUpdateQuantity,
   onRemoveItem,
   onCheckout,
-  onBrowseCatalogue
+  onBrowseCatalogue,
 }) => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
@@ -27,9 +29,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   if (!isOpen) return null;
 
+  const totalItemCount = cart.reduce((s, i) => s + i.quantity, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const discountAmount = Math.round(subtotal * appliedDiscount);
   const total = Math.max(0, subtotal - discountAmount);
+
+  // Free shipping calculation
+  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const freeShippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +48,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       setAppliedDiscount(0.15);
       setCouponMsg({ text: '15% First Order discount applied!', isError: false });
     } else {
-      setCouponMsg({ text: 'Invalid code. Try coupon "AYURVEDA10" for 10% off.', isError: true });
+      setCouponMsg({ text: 'Invalid code. Try "AYURVEDA10" for 10% off.', isError: true });
     }
   };
 
@@ -55,9 +62,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <div className="p-5 sm:p-6 border-b border-[#EAE1D1] flex items-center justify-between bg-[#F4EDE2]">
             <div className="flex items-center gap-3">
               <ShoppingBag className="w-5 h-5 text-[#7D5A34]" />
-              <h2 className="font-brand text-base font-bold text-[#222E22] tracking-wider uppercase">Ayurvedic Basket</h2>
+              <h2 className="font-brand text-base font-bold text-[#222E22] tracking-wider uppercase">Your Sacred Basket</h2>
               <span className="font-ui text-xs px-2.5 py-0.5 rounded-full bg-[#E5D7C2] text-[#694E2F] font-bold">
-                {cart.reduce((s, i) => s + i.quantity, 0)} items
+                {totalItemCount} {totalItemCount === 1 ? 'item' : 'items'}
               </span>
             </div>
             <button
@@ -69,6 +76,33 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             </button>
           </div>
 
+          {/* Dynamic Free Shipping Meter */}
+          {cart.length > 0 && (
+            <div className="bg-[#EFE6D6] px-5 sm:px-6 py-3 border-b border-[#DECDB3] space-y-1.5 font-ui text-xs">
+              <div className="flex items-center justify-between font-semibold">
+                <span className="flex items-center gap-1.5 text-[#4D3E30]">
+                  <Truck className="w-3.5 h-3.5 text-[#7D5A34]" />
+                  {remainingForFreeShipping === 0 ? (
+                    <span className="text-emerald-800 font-bold">🎉 Free Express Shipping Unlocked!</span>
+                  ) : (
+                    <span>
+                      Add <strong className="text-[#7D5A34]">₹{remainingForFreeShipping}</strong> more for Free Shipping
+                    </span>
+                  )}
+                </span>
+                <span className="text-[10px] text-[#7A6B5B] font-bold">
+                  {Math.round(freeShippingProgress)}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-[#DACBB2] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#7D5A34] via-[#C9A24D] to-[#2D3E2F] rounded-full transition-all duration-300"
+                  style={{ width: `${freeShippingProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Items List */}
           <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
             {cart.length === 0 ? (
@@ -78,7 +112,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
                 <h3 className="font-brand text-lg font-bold text-[#222E22]">Your Basket is Empty</h3>
                 <p className="font-editorial text-base text-[#6E5E4D] max-w-xs leading-relaxed">
-                  Explore our classical Ayurvedic Ubtan or pure botanical floral waters to begin your sacred snana ritual.
+                  Explore our classical Ayurvedic Ubtan or pure botanical floral waters to begin your daily snana ritual.
                 </p>
                 <button
                   onClick={() => { onClose(); onBrowseCatalogue(); }}
@@ -185,32 +219,47 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 )}
                 <div className="flex justify-between">
                   <span>Plastic-Free Express Courier</span>
-                  <span className="font-bold text-[#2D3E2F]">FREE</span>
+                  <span className="font-bold text-[#2D3E2F]">
+                    {remainingForFreeShipping === 0 ? 'FREE' : '₹49 (or add ₹' + remainingForFreeShipping + ' for Free)'}
+                  </span>
                 </div>
                 <div className="border-t border-[#DECDB3] pt-2 flex justify-between text-base font-bold">
                   <span className="font-brand text-[#222E22]">Total Due</span>
-                  <span className="font-brand text-2xl text-[#7D5A34]">₹{total}</span>
+                  <span className="font-brand text-2xl text-[#7D5A34]">
+                    ₹{total + (remainingForFreeShipping === 0 ? 0 : 49)}
+                  </span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <button
                   onClick={() => { onClose(); onCheckout(); }}
-                  className="w-full py-4 px-6 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-[#F9F6F0] font-ui text-xs uppercase tracking-[0.25em] font-semibold transition-all shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-4 px-6 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-[#F9F6F0] font-ui text-xs uppercase tracking-[0.25em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 active:scale-98"
                 >
-                  Proceed to Checkout <ArrowRight className="w-4 h-4" />
+                  Proceed to Checkout <ArrowRight className="w-4 h-4 text-[#C9A24D]" />
                 </button>
                 <button
                   onClick={() => { onClose(); onBrowseCatalogue(); }}
-                  className="w-full py-2.5 text-center font-ui text-xs text-[#6B5A46] hover:text-[#222E22] uppercase tracking-wider font-semibold transition-colors"
+                  className="w-full py-2 text-center font-ui text-xs text-[#6B5A46] hover:text-[#222E22] uppercase tracking-wider font-semibold transition-colors"
                 >
                   Continue Browsing Formulations
                 </button>
               </div>
 
-              <div className="pt-1 flex items-center justify-center gap-1.5 text-[10px] font-ui text-[#7A6B5B]">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#2D3E2F]" />
-                <span>100% Genuine Ayurvedic Products • Biodegradable Wrap</span>
+              {/* 3 Trust Pillars */}
+              <div className="pt-2 border-t border-[#DECDB3]/70 grid grid-cols-3 gap-2 text-center text-[10px] font-ui text-[#7A6B5B]">
+                <div className="flex flex-col items-center gap-1">
+                  <Lock className="w-3.5 h-3.5 text-[#2D3E2F]" />
+                  <span>256-Bit Encrypted</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Leaf className="w-3.5 h-3.5 text-[#2D3E2F]" />
+                  <span>100% Botanicals</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <Package className="w-3.5 h-3.5 text-[#2D3E2F]" />
+                  <span>Plastic-Free Pack</span>
+                </div>
               </div>
             </div>
           )}

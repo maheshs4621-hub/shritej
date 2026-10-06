@@ -90,7 +90,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const reviews = reviewListState.length > 0 ? reviewListState : fallbackReviews;
 
   return (
-    <div className="py-8 sm:py-16 bg-[#FAF7F2] min-h-screen">
+    <div className="py-8 sm:py-16 bg-[#FAF7F2] min-h-screen pb-28 lg:pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Navigation Breadcrumb / Back */}
@@ -499,6 +499,51 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         )}
 
+            </div>
+      {/* Mobile Sticky Floating Purchase Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#DECDB3] px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-11 h-11 rounded-xl object-contain bg-[#F4EDE2] p-1 border border-[#E3DAC8] flex-shrink-0"
+          />
+          <div className="min-w-0">
+            <h4 className="font-brand text-xs font-bold text-[#222E22] truncate">{product.name}</h4>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-brand text-sm font-bold text-[#202E22]">₹{product.price}</span>
+              {product.originalPrice && (
+                <span className="font-ui text-[10px] text-[#8A7966] line-through">₹{product.originalPrice}</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {product.stock === 0 ? (
+            <span className="px-4 py-2.5 rounded-full bg-neutral-200 text-neutral-500 font-ui text-[11px] uppercase tracking-wider font-bold">
+              Sold Out
+            </span>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => onAddToCart(product, quantity)}
+                className="px-3.5 py-2.5 rounded-full border border-[#7D5A34] text-[#473A2D] hover:bg-[#F2E8D7] font-ui text-[11px] uppercase tracking-wider font-bold flex items-center gap-1 active:scale-95 transition-all"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-[#7D5A34]" />
+                <span>Add</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onBuyNow(product, quantity)}
+                className="px-4 py-2.5 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-[#F9F6F0] font-ui text-[11px] uppercase tracking-wider font-bold shadow-md active:scale-95 transition-all"
+              >
+                Buy Now
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

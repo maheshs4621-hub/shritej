@@ -1,7 +1,7 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Product } from '../types';
 import { ProductCard } from './ProductCard';
-import { Search, Filter, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 
 interface ProductsPageProps {
   products: Product[];
@@ -29,6 +29,14 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'newest'>('featured');
 
   const categories = ['All', 'Ubtan & Lepa', 'Toners & Mists', 'Bathing Rituals', 'Combos & Kits', 'Facial Oils'];
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: products.length };
+    products.forEach((p) => {
+      counts[p.category] = (counts[p.category] || 0) + 1;
+    });
+    return counts;
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
     return products
@@ -109,20 +117,28 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
             </div>
           </div>
 
-          {/* Category Chips */}
+          {/* Category Chips with Counts */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#DECDB3]/70">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={
-                  'px-4 py-2 rounded-full font-ui text-[11px] sm:text-xs uppercase tracking-[0.15em] font-semibold transition-all ' +
+                  'px-4 py-2 rounded-full font-ui text-[11px] sm:text-xs uppercase tracking-[0.15em] font-semibold transition-all flex items-center gap-2 ' +
                   (selectedCategory === cat
                     ? 'bg-[#2D3E2F] text-white shadow-sm'
                     : 'bg-[#FAF7F2] text-[#554737] hover:bg-[#E8DCC9] hover:text-[#222E22] border border-[#D8C7AF]')
                 }
               >
-                {cat}
+                <span>{cat}</span>
+                <span
+                  className={
+                    'text-[10px] px-1.5 py-0.5 rounded-full font-bold leading-none ' +
+                    (selectedCategory === cat ? 'bg-white/20 text-white' : 'bg-[#E5D7C2] text-[#694E2F]')
+                  }
+                >
+                  {categoryCounts[cat] || 0}
+                </span>
               </button>
             ))}
           </div>
@@ -151,29 +167,14 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((prod) => (
-              <div key={prod.id} className="flex flex-col">
-                <ProductCard
-                  product={prod}
-                  onAddToCart={onAddToCart}
-                  onViewDetails={onViewDetails}
-                  isWishlisted={wishlist.includes(prod.id)}
-                  onToggleWishlist={onToggleWishlist}
-                />
-                <div className="mt-2.5 flex items-center gap-2">
-                  <button
-                    onClick={() => onBuyNow(prod)}
-                    className="flex-1 py-2 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-bold transition-all shadow-sm text-center"
-                  >
-                    ⚡ Buy Now
-                  </button>
-                  <button
-                    onClick={() => onViewDetails(prod, 'overview')}
-                    className="px-4 py-2 rounded-full border border-[#B5A187] hover:border-[#7D5A34] text-[#473A2D] font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold hover:bg-[#FAF7F2] transition-all"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
+              <ProductCard
+                key={prod.id}
+                product={prod}
+                onAddToCart={onAddToCart}
+                onViewDetails={onViewDetails}
+                isWishlisted={wishlist.includes(prod.id)}
+                onToggleWishlist={onToggleWishlist}
+              />
             ))}
           </div>
         )}
