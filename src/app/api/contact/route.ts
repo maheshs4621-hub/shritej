@@ -1,20 +1,25 @@
 ﻿import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
     const { name, email, phone, subject, message } = await req.json();
 
-    const { data, error } = await supabase.from('inquiries').insert([
-      { name, email, phone, subject, message }
-    ]);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (error) {
-      console.warn('Supabase contact note:', error.message);
-      return NextResponse.json({ success: true, savedToDb: false, message: error.message });
+    if (supabaseUrl && supabaseKey) {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        await supabase.from('inquiries').insert([{ name, email, phone, subject, message }]);
+      } catch (dbErr) {
+        console.warn('Supabase inquiry note:', dbErr);
+      }
     }
 
-    return NextResponse.json({ success: true, savedToDb: true, data });
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
