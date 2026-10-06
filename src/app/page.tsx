@@ -318,6 +318,11 @@ export default function ShritejAyurvedaApp() {
 
   return (
     <div className="min-h-screen bg-[#F8F5EE] text-[#2C2723] flex flex-col justify-between selection:bg-[#C9A24D]/30">
+      {/* Authentic Traditional Ayurvedic Splash Screen */}
+      {showSplash && (
+        <SplashScreen onFinish={() => setShowSplash(false)} />
+      )}
+
       <div>
         
         
@@ -668,10 +673,7 @@ export default function ShritejAyurvedaApp() {
       {/* Global Comprehensive Footer */}
       <Footer onNavigate={handleNavigate} />
 
-      {/* Splash Screen */}
-      {showSplash && (
-        <SplashScreen onFinish={() => setShowSplash(false)} />
-      )}
+      
 
       {/* Google / Email Authentication Modal */}
       <AuthModal
