@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
-import { ShoppingBag, Menu, X, Search, Heart, User } from 'lucide-react';
-import { ViewType } from '../types';
+import { ShoppingBag, Menu, X, Search, Heart, User, Truck, ShieldCheck, LogIn, ChevronDown, LogOut } from 'lucide-react';
+import { ViewType, UserProfile } from '../types';
 
 interface NavbarProps {
   cartCount: number;
@@ -9,6 +9,9 @@ interface NavbarProps {
   onNavigate: (view: ViewType, category?: string) => void;
   openCart: () => void;
   onSearchOpen: () => void;
+  currentUser?: UserProfile | null;
+  onOpenAuth?: () => void;
+  onLogout?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -17,13 +20,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeView,
   onNavigate,
   openCart,
-  onSearchOpen
+  onSearchOpen,
+  currentUser,
+  onOpenAuth,
+  onLogout,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
   const handleNavClick = (view: ViewType, category?: string) => {
     onNavigate(view, category);
     setIsMobileMenuOpen(false);
+    setIsUserDropdownOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -32,6 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { label: 'OUR STORY', view: 'story' },
     { label: 'AYURVEDA', view: 'ayurveda' },
     { label: 'PRODUCTS', view: 'products' },
+    { label: 'TRACK ORDER', view: 'track-order' },
     { label: 'SUSTAINABILITY', view: 'sustainability' },
     { label: 'CONTACT', view: 'contact' },
   ];
@@ -70,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-7 font-ui text-[12px] uppercase tracking-[0.2em] font-semibold text-[#574B3D]">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-7 font-ui text-[12px] uppercase tracking-[0.18em] font-semibold text-[#574B3D]">
           {navLinks.map((item) => (
             <button
               key={item.label}
@@ -87,8 +96,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           ))}
         </nav>
 
-        {/* Right Action Icons: Search, Account, Wishlist, Cart */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        {/* Right Action Icons: Search, User / Auth, Wishlist, Cart */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           
           {/* Search Icon */}
           <button
@@ -100,20 +109,70 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
-          {/* Account Icon */}
-          <button
-            onClick={() => handleNavClick('account')}
-            className={
-              'p-2 sm:p-2.5 rounded-full transition-colors ' +
-              (activeView === 'account'
-                ? 'bg-[#EAE0D0] text-[#7D5A34]'
-                : 'text-[#524436] hover:text-[#222E22] hover:bg-[#EFE5D6]')
-            }
-            title="My Account & Orders"
-            aria-label="Account"
-          >
-            <User className="w-4 h-4 sm:w-5 sm:h-5" />
-          </button>
+          {/* User Profile / Auth Button */}
+          {currentUser ? (
+            <div className="relative">
+              <button
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EFE6D6] hover:bg-[#E8DFCF] text-[#2D3E2F] border border-[#DECDB3] transition-all font-ui text-xs font-semibold"
+                aria-label="User Account"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#2D3E2F] text-white flex items-center justify-center text-[11px] font-bold">
+                  {(currentUser.name || 'P').charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:inline max-w-[80px] truncate">{currentUser.name.split(' ')[0]}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#7D6B58]" />
+              </button>
+
+              {/* User Dropdown */}
+              {isUserDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#FAF7F2] border border-[#DECDB3] shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 font-ui text-xs">
+                  <div className="px-4 py-2 border-b border-[#DECDB3]">
+                    <p className="font-bold text-[#222E22] truncate">{currentUser.name}</p>
+                    <p className="text-[#7A6B5B] text-[11px] truncate">{currentUser.email}</p>
+                  </div>
+                  <button
+                    onClick={() => handleNavClick('account')}
+                    className="w-full text-left px-4 py-2.5 hover:bg-[#F4EDE2] text-[#453A2E] flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4 text-[#7D5A34]" /> My Orders &amp; Profile
+                  </button>
+                  <button
+                    onClick={() => handleNavClick('track-order')}
+                    className="w-full text-left px-4 py-2.5 hover:bg-[#F4EDE2] text-[#453A2E] flex items-center gap-2"
+                  >
+                    <Truck className="w-4 h-4 text-[#7D5A34]" /> Live Shipment Tracker
+                  </button>
+                  {currentUser.isAdmin && (
+                    <button
+                      onClick={() => handleNavClick('admin')}
+                      className="w-full text-left px-4 py-2.5 hover:bg-[#F4EDE2] text-[#2D3E2F] font-bold flex items-center gap-2 border-t border-[#DECDB3]/60"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-[#2D3E2F]" /> Super Admin Console
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setIsUserDropdownOpen(false);
+                      if (onLogout) onLogout();
+                    }}
+                    className="w-full text-left px-4 py-2.5 hover:bg-rose-50 text-rose-600 flex items-center gap-2 border-t border-[#DECDB3]"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => { if (onOpenAuth) onOpenAuth(); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EFE6D6] hover:bg-[#E8DFCF] text-[#2D3E2F] border border-[#DECDB3] transition-all font-ui text-xs font-semibold"
+              title="Sign in with Google or Email"
+            >
+              <LogIn className="w-3.5 h-3.5 text-[#7D5A34]" />
+              <span className="hidden sm:inline">Sign In</span>
+            </button>
+          )}
 
           {/* Wishlist Icon */}
           <button
@@ -178,18 +237,33 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {item.label}
               </button>
             ))}
-            <div className="pt-2 flex items-center gap-3">
+            <div className="pt-2 flex flex-wrap items-center gap-2.5">
+              {currentUser ? (
+                <button
+                  onClick={() => handleNavClick('account')}
+                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#2D3E2F] text-white text-xs font-ui uppercase"
+                >
+                  <User className="w-3.5 h-3.5" /> {currentUser.name.split(' ')[0]}
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); if (onOpenAuth) onOpenAuth(); }}
+                  className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#2D3E2F] text-white text-xs font-ui uppercase"
+                >
+                  <LogIn className="w-3.5 h-3.5" /> Sign In
+                </button>
+              )}
               <button
-                onClick={() => handleNavClick('account')}
+                onClick={() => handleNavClick('track-order')}
                 className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#F4EDE2] border border-[#DECDB3] text-xs font-ui uppercase"
               >
-                <User className="w-3.5 h-3.5" /> My Account
+                <Truck className="w-3.5 h-3.5 text-[#7D5A34]" /> Track Order
               </button>
               <button
-                onClick={() => handleNavClick('wishlist')}
-                className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#F4EDE2] border border-[#DECDB3] text-xs font-ui uppercase"
+                onClick={() => handleNavClick('admin')}
+                className="flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-[#F4EDE2] border border-[#DECDB3] text-xs font-ui uppercase text-[#7D5A34]"
               >
-                <Heart className="w-3.5 h-3.5" /> Wishlist ({wishlistCount})
+                <ShieldCheck className="w-3.5 h-3.5" /> Admin
               </button>
             </div>
           </div>

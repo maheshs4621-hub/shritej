@@ -1,10 +1,10 @@
-﻿-- ========================================================
+-- ========================================================
 -- SHRiTEJ AYURVED Database Schema for Supabase
--- Run this in your Supabase SQL Editor:
+-- Paste and Run in Supabase SQL Editor:
 -- https://supabase.com/dashboard/project/dkiniypyxuarcjtmjnop/sql/new
 -- ========================================================
 
--- 1. Products Table
+-- 1. Create Products Table
 CREATE TABLE IF NOT EXISTS public.products (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   original_price NUMERIC,
   rating NUMERIC DEFAULT 5.0,
   reviews_count INTEGER DEFAULT 0,
+  reviews_list JSONB DEFAULT '[]'::jsonb,
   category TEXT NOT NULL,
   image TEXT NOT NULL,
   stock INTEGER DEFAULT 50,
@@ -32,10 +33,11 @@ CREATE TABLE IF NOT EXISTS public.products (
   sku TEXT,
   weight TEXT,
   specs JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Orders Table
+-- 2. Create Orders Table
 CREATE TABLE IF NOT EXISTS public.orders (
   id TEXT PRIMARY KEY,
   customer_name TEXT NOT NULL,
@@ -53,7 +55,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Inquiries / Contact Form Table
+-- 3. Create Inquiries Table (Contact Form)
 CREATE TABLE IF NOT EXISTS public.inquiries (
   id BIGSERIAL PRIMARY KEY,
   name TEXT NOT NULL,
@@ -64,32 +66,546 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Newsletter Subscribers Table
+-- 4. Create Newsletter Subscribers Table
 CREATE TABLE IF NOT EXISTS public.subscribers (
   id BIGSERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security (RLS)
+-- 5. Create Product Reviews Table
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id TEXT PRIMARY KEY,
+  product_id TEXT REFERENCES public.products(id) ON DELETE CASCADE,
+  author TEXT NOT NULL,
+  rating NUMERIC NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  date TEXT NOT NULL,
+  comment TEXT NOT NULL,
+  verified BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security (RLS) on all tables
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
--- Allow public read access to products
-CREATE POLICY "Public products are viewable by everyone" 
-  ON public.products FOR SELECT USING (true);
+-- Drop existing policies if any
+DROP POLICY IF EXISTS "Public read access for products" ON public.products;
+DROP POLICY IF EXISTS "Public write access for products" ON public.products;
+DROP POLICY IF EXISTS "Public insert access for orders" ON public.orders;
+DROP POLICY IF EXISTS "Public read access for orders" ON public.orders;
+DROP POLICY IF EXISTS "Public insert access for inquiries" ON public.inquiries;
+DROP POLICY IF EXISTS "Public insert access for subscribers" ON public.subscribers;
+DROP POLICY IF EXISTS "Public read access for reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Public insert access for reviews" ON public.reviews;
 
--- Allow public insert access for inquiries, subscribers, and orders
-CREATE POLICY "Anyone can submit contact inquiries" 
-  ON public.inquiries FOR INSERT WITH CHECK (true);
+-- Create policies for public client & anon key access
+CREATE POLICY "Public read access for products" ON public.products FOR SELECT USING (true);
+CREATE POLICY "Public write access for products" ON public.products FOR ALL USING (true);
+CREATE POLICY "Public insert access for orders" ON public.orders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public read access for orders" ON public.orders FOR SELECT USING (true);
+CREATE POLICY "Public insert access for inquiries" ON public.inquiries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public insert access for subscribers" ON public.subscribers FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public read access for reviews" ON public.reviews FOR SELECT USING (true);
+CREATE POLICY "Public insert access for reviews" ON public.reviews FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Anyone can subscribe to newsletter" 
-  ON public.subscribers FOR INSERT WITH CHECK (true);
+-- Insert or Update Initial Authentic Products
 
-CREATE POLICY "Anyone can place an order" 
-  ON public.orders FOR INSERT WITH CHECK (true);
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'ubtan-100g',
+  'SHRiTEJ Traditional Ayurvedic Ubtan (100g)',
+  'Pure authentic herbal formulation for naturally glowing & radiant skin',
+  299,
+  449,
+  5,
+  9,
+  '[{"id":"r1","author":"Pooja Kulkarni","rating":5,"date":"2 days ago","comment":"This authentic Ayurvedic formulation gave my skin an instant radiant golden glow! Pure botanical feel with no chemicals.","verified":true},{"id":"r2","author":"Aniket Deshmukh","rating":5,"date":"5 days ago","comment":"Gently cleared deep sun tanning within a week. The fragrance is pure natural sandalwood and herbs.","verified":true},{"id":"r3","author":"Sneha Patil","rating":5,"date":"1 week ago","comment":"Truly authentic. Mixed with SHRiTEJ Rose Water, it leaves skin nourished without any dryness.","verified":true},{"id":"r4","author":"Rahul Shinde","rating":4.9,"date":"2 weeks ago","comment":"Unbeatable craftsmanship and earth-conscious biodegradable wrap. Genuine Indian wellness.","verified":true}]'::jsonb,
+  'Ubtan & Lepa',
+  '/images/shritej-ubtan.jpg',
+  85,
+  true,
+  true,
+  'Crafted strictly according to time-honoured Ayurvedic wisdom. SHRiTEJ AYURVED Traditional Ayurvedic Ubtan is 100% natural, pure herbal, and free from added synthetic chemicals. Packed with potent botanicals including Manjishta, Chandan, Vetchandan, Lodhra, Nagkesar, Halad, Gulab, and Multani Mitti. Gently purifies pores, reduces sun tan, fades blemishes, and imparts a natural golden luster.',
+  'Manjishta (Rubia cordifolia), Chandan (Santalum album), Vetchandan, Lodhra (Symplocos racemosa), Nagkesar (Mesua ferrea), Multani Mitti (Fuller''s Earth), Halad (Curcuma longa), Gulab Petal Powder (Rosa damascena).',
+  '["Traditionally valued for calming Pitta and Kapha skin imbalances","Naturally exfoliates without stripping natural lipid barriers","Supports healthy skin cell renewal and reversal of tanning","Imparts a natural golden Ayurvedic complexion (Varnya)"]'::jsonb,
+  'Take 1 to 2 teaspoons in a brass or ceramic bowl. Mix with SHRiTEJ Pure Kannauj Rose Water (for oily/normal skin) or raw organic milk/curd (for dry skin) to form a smooth paste. Apply evenly over face and neck. Leave for 12-15 minutes until semi-dry. Rinse with cool water in gentle circular motions.',
+  'All skin types (Vata, Pitta, Kapha). Suitable for both men and women.',
+  '100g',
+  '24 Months from manufacturing date',
+  'Store in a cool, dry place away from direct sunlight. Ensure zipper pouch is sealed tightly after each use.',
+  '100% Biodegradable unbleached raw kraft stand-up pouch with moisture-barrier compostable lining.',
+  'Zero plastic exterior. 100% biodegradable kraft and water-based soy ink printing.',
+  'Ayurvedic proprietary cosmetic formulation. For external use only. Natural ingredients may be prone to slight color variations across batches without affecting potency. Patch test recommended before first use.',
+  'STA-UBT-100',
+  '100g',
+  '{"Form":"Fine Stone-Pulverized Botanical Powder","Herbal Actives":"Manjishta, Lodhra, Chandan, Halad, Gulab, Nagkesar","Purity Standard":"100% Natural, Chemical Free, Skin-friendly","Skin Compatibility":"For All Skin Types (Men & Women)","Packaging":"Biodegradable Resealable Pouch"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
 
-CREATE POLICY "Users can view their orders" 
-  ON public.orders FOR SELECT USING (true);
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'rose-water',
+  'SHRiTEJ Kannauj Pure Steam-Distilled Gulab Jal (200ml)',
+  '100% Pure Distillate natural face toner & Ayurvedic ubtan activator',
+  249,
+  349,
+  4.9,
+  8,
+  '[{"id":"r5","author":"Meera Iyer","rating":5,"date":"3 days ago","comment":"The natural aroma of Kannauj roses is divine. Not synthetic perfume at all, just soothing real rose water.","verified":true},{"id":"r6","author":"Kavita Joshi","rating":4.9,"date":"1 week ago","comment":"So soothing on my sensitive skin. I spritz this throughout the day in summer.","verified":true}]'::jsonb,
+  'Toners & Mists',
+  '/images/shivtej-rose-water.jpg',
+  65,
+  true,
+  true,
+  'SHRiTEJ AYURVED Premium Rose Water is crafted via classical Deg-Bhapka hydro-steam distillation of freshly handpicked Kannauj Damask roses. 100% pure steam-distilled floral hydrosol. Balances skin pH, calms flushed redness, tightens enlarged pores, and acts as the perfect botanical activator for SHRiTEJ Ayurvedic Ubtan.',
+  '100% Pure Steam Distillate of fresh Indian Damask Roses (Rosa damascena hydrosol). Zero added alcohol, artificial fragrance, or synthetic preservatives.',
+  '["Traditionally cools excess Pitta heat in facial skin","Hydrates and balances natural skin moisture levels","Acts as a gentle botanical astringent to refine pore appearance","Aromatherapeutic Damask rose essence calms senses"]'::jsonb,
+  'Spritz generously onto cleansed face and neck morning and evening. Allow to air absorb. Alternatively, use 2 tablespoons to activate SHRiTEJ Traditional Ayurvedic Ubtan into a smooth paste.',
+  'All skin types, especially sensitive and inflamed Pitta skin.',
+  '200ml',
+  '18 Months from distillation',
+  'Keep in a cool, shaded sanctuary. Can be refrigerated for an invigorating cooling effect.',
+  'Reusable amber recyclable bottle with fine mist sprayer and eco-label.',
+  'Glass/PET recyclable vessel, plastic-minimized pump, biodegradable unbleached carton.',
+  'Natural hydrosol. Free from parabens, synthetic fragrances, and alcohol.',
+  'STA-GJ-200',
+  '230g',
+  '{"Origin":"Kannauj, India (Traditional Hydro-Distillation)","Packaging":"Fine Mist Sprayer, Eco-Friendly Bottle","Purity Standard":"100% Pure Distillate, Zero Added Alcohol","Application":"Direct Hydrosol Mist or Ubtan Activator"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
+
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'chandan-bar',
+  'SHRiTEJ Mysore Sandalwood & A2 Ghee Soap (125g)',
+  'Artisan handmade bath bar with Pure Mysore Sandalwood & Vedic A2 Cow Ghee',
+  189,
+  260,
+  5,
+  7,
+  '[{"id":"r7","author":"Dr. Ramesh Sharma","rating":5,"date":"4 days ago","comment":"Outstanding soap. The inclusion of genuine A2 Ghee leaves skin so supple without needing lotion.","verified":true},{"id":"r8","author":"Aditi Nair","rating":5,"date":"2 weeks ago","comment":"The packaging with jute thread and handmade paper is breathtakingly traditional. Smells like a temple.","verified":true}]'::jsonb,
+  'Bathing Rituals',
+  '/images/shivtej-soap.jpg',
+  70,
+  true,
+  true,
+  'SHRiTEJ AYURVED Mysore Sandalwood Bath Bar is an artisan cold-cured soap enriched with real Indian Sandalwood paste, Vedic A2 Cow Ghee, and virgin cold-pressed coconut oil. Produces a velvety, creamy lather that deep cleanses pores while sealing natural skin lipids without tightness.',
+  'Pure Mysore Sandalwood Extract (Santalum album), Vedic Gir Cow A2 Ghee, Saponified Virgin Coconut Oil, Castor Oil, Mahua Oil, Botanical Glycerin, Natural Sandalwood Essential Oil.',
+  '["Pure Chandan cools and soothes irritated, sun-stressed skin","Vedic A2 Ghee deeply penetrates epidermis for long-lasting hydration","Promotes satvik calming during classical daily snana (bath)","Helps clear blemishes and maintains natural moisture barrier"]'::jsonb,
+  'Wet skin with lukewarm water. Rub the bar gently between palms to generate rich Ayurvedic lather. Massage over body in mindful circles. Rinse thoroughly.',
+  'Normal to dry, sensitive skin. Gentle enough for daily bath ritual.',
+  '125g',
+  '36 Months from packaging',
+  'Store in a draining soap dish to dry between uses for extended bar life.',
+  'Hand-wrapped in 100% natural handmade cotton-rag paper and bound with organic raw jute twine. Completely plastic-free.',
+  '100% Zero Plastic Packaging. Biodegradable compostable wrap.',
+  'Grade 1 TFM (>78%). SLS & Paraben free. Free from animal fat.',
+  'STA-SN-125',
+  '125g',
+  '{"Net Weight":"125g Handcrafted Embossed Bar","Key Ingredients":"Pure Mysore Sandalwood, Vedic A2 Cow Ghee, Cold-Pressed Coconut Oil","Quality Standard":"Grade 1 TFM (>78%), SLS Free, Paraben Free","Packaging":"100% Plastic-Free Handmade Cotton Paper & Jute"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
+
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'ubtan-glow-combo',
+  'SHRiTEJ Royal Ubtan & Rose Water Ritual Duo',
+  'Complete Ayurvedic glowing ritual pack with Steam-Distilled Gulab Jal',
+  499,
+  749,
+  5,
+  10,
+  '[{"id":"r9","author":"Swati R.","rating":5,"date":"3 days ago","comment":"Best duo for weekly pampering. Skin looks so fresh and clean after using them together.","verified":true}]'::jsonb,
+  'Combos & Kits',
+  '/images/shivtej-rose-water.jpg',
+  40,
+  true,
+  false,
+  'The ultimate Ayurvedic glow pairing. Includes authentic SHRiTEJ Traditional Ayurvedic Ubtan (100g) paired with our 100% pure Kannauj Rose Water to create the perfect soothing paste for regular exfoliation, instant tan reversal, and deep hydration.',
+  'Combo kit containing 1x SHRiTEJ Traditional Ubtan (100g) and 1x Kannauj Pure Rose Water (200ml).',
+  '["Comprehensive synergistic treatment for uneven skin tone","Rose water acts as the optimal botanical carrier for Ubtan actives","Purifies pores and imparts a lit-from-within Ayurvedic radiance","Time-tested combination used in traditional bridal snana rituals"]'::jsonb,
+  'Scoop 1 teaspoon Ubtan into a bowl, spritz 4-5 pumps of Rose Water, mix into a paste. Apply for 15 minutes and rinse gently.',
+  'All skin types looking for natural tan clearing and radiance.',
+  '100g Pouch + 200ml Bottle',
+  '18 Months',
+  'Store in cool dry conditions.',
+  'Packed in an unbleached recycled cardboard gift box with wood-wool padding.',
+  '100% recyclable shipping box, minimal tape, biodegradable cushioning.',
+  'Ayurvedic proprietary kit. For external wellness ritual only.',
+  'STA-KIT-DUO',
+  '350g',
+  '{"Kit Contents":"1x Ubtan (100g) + 1x Kannauj Rose Water (200ml)","Primary Benefits":"Instant tan removal, refined pores, radiant glow","Ritual Frequency":"2-3 times weekly"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
+
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'ubtan-snana-trio',
+  'SHRiTEJ Complete Ayurvedic Snana Box (3-Piece)',
+  'The Ultimate 3-Piece Traditional Bathing & Glow Ritual',
+  699,
+  1050,
+  5,
+  6,
+  '[{"id":"r10","author":"Gaurav K.","rating":5,"date":"1 week ago","comment":"Gifted this to my mother for Diwali. The aroma and packaging are genuinely royal and Ayurvedic.","verified":true}]'::jsonb,
+  'Combos & Kits',
+  '/images/shivtej-soap.jpg',
+  35,
+  true,
+  true,
+  'An all-inclusive Ayurvedic body and skin care sanctuary box. Contains SHRiTEJ Ayurvedic Ubtan (100g), Mysore Sandalwood & A2 Ghee Soap (125g), and Pure Kannauj Rose Water (200ml) for a royal snana ritual at home.',
+  'Complete trio: Ubtan Herbal Powder, Mysore Sandalwood Cold-Cured Soap, Steam-Distilled Rose Water.',
+  '["Cleanses, exfoliates, and balances total body skin vitality","Replaces synthetic shower gels and plastic body scrubs completely","Infuses skin with sacred sandalwood, saffron notes, and herbal warmth"]'::jsonb,
+  'Cleanse body with Mysore Sandalwood soap. Once weekly, apply Ubtan mixed with Rose Water over full body. Spritz rose water after drying.',
+  'Full family wellness, festive preparation, daily Ayurvedic bathing.',
+  '100g + 125g + 200ml',
+  '18 Months',
+  'Store in ambient conditions away from damp moisture.',
+  'Packaged in a heritage corrugated unbleached gift box tied with raw coir string.',
+  'Completely plastic-free outer packaging.',
+  'Pure botanical formulations. Zero synthetic foaming agents.',
+  'STA-KIT-TRIO',
+  '500g',
+  '{"Box Includes":"1x Ubtan (100g) + 1x Soap (125g) + 1x Rose Water (200ml)","Best For":"Festivals, Weddings, Complete Skincare Wellness","Packaging":"Biodegradable Craft Box"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
+
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'ubtan-family-200g',
+  'SHRiTEJ Ayurvedic Ubtan Family Pack (200g)',
+  'Double value pack of our signature herbal glowing ubtan',
+  499,
+  799,
+  4.9,
+  8,
+  '[{"id":"r11","author":"Sunita M.","rating":5,"date":"5 days ago","comment":"We use this for the whole family on Sundays. Makes skin very soft without soap.","verified":true}]'::jsonb,
+  'Ubtan & Lepa',
+  '/images/shritej-ubtan.jpg',
+  50,
+  true,
+  false,
+  'Economical family size pouch of authentic SHRiTEJ Ayurvedic Ubtan. Ideal for daily face cleansing, bridal glow prep, and weekly whole-body traditional Ayurvedic bath (snana). Packed with Manjishta, Chandan, Lodhra, and Halad.',
+  'Manjishta, Chandan, Vetchandan, Lodhra, Nagkesar, Multani Mitti, Halad, Gulab Petals.',
+  '["Ample quantity for whole body Ayurvedic snana (bath ritual)","Natural solution for body tanning, rough elbows, and back acne","Economical eco-pack saving packaging waste"]'::jsonb,
+  'Use 2-3 tablespoons for full body massage before bath. Let sit for 10 minutes then wash off with warm water.',
+  'All skin types, full family use.',
+  '200g (2 x 100g Pouches)',
+  '24 Months',
+  'Seal zip lock tightly after opening.',
+  'Biodegradable kraft twin pouches.',
+  'Reduces outer packaging overhead by 40%.',
+  'Natural product. Suitable for external use.',
+  'STA-UBT-200',
+  '210g',
+  '{"Net Weight":"200g (2 x 100g Pouches)","Benefits":"Full-body tan removal, silky texture, blemish clearing","Ingredients":"Chandan, Halad, Manjishta, Lodhra, Gulab, Nagkesar"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
+
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'kumkumadi-oil',
+  'SHRiTEJ Kumkumadi Miraculous Beauty Tailam (30ml)',
+  'Ancient Kashmiri Saffron elixir with 26 classical botanicals',
+  799,
+  1299,
+  5,
+  7,
+  '[{"id":"r12","author":"Nandini Sen","rating":5,"date":"1 week ago","comment":"A few drops overnight and wake up with glowing, non-greasy skin. Real saffron strands inside!","verified":true}]'::jsonb,
+  'Facial Oils',
+  'https://images.unsplash.com/photo-1608248597359-00f73f7c32bf?w=800&auto=format&fit=crop&q=80',
+  25,
+  true,
+  false,
+  'Formulated according to classical Ashtanga Hridaya taila paka methods. Infused with Grade-A Kashmiri Mogra Saffron, Red Sandalwood, Manjishta, and sacred lotus stamens in cold-pressed sesame oil. Apply nightly after washing off SHRiTEJ Ubtan to seal in moisture and rejuvenate skin tone.',
+  'Kashmiri Kesar (Crocus sativus), Raktachandana, Manjishta, Yashtimadhu, Ushira, Padmaka, Kamal Kesar, Cold-Pressed Black Sesame Oil, Goat Milk decoction.',
+  '["Traditionally celebrated as classical \"Varnya Tailam\" for radiant skin","Assists in minimizing fine lines and pigmentation spots","Provides deep lipid nourishment during overnight rejuvenation"]'::jsonb,
+  'Take 2 to 3 drops onto clean fingertips. Gently press onto cleansed, slightly damp face and neck. Massage in upward strokes until absorbed.',
+  'Normal to dry, mature, and dull skin.',
+  '30ml',
+  '24 Months',
+  'Store away from direct light.',
+  'Heavy amber UV-protective glass bottle with glass dropper.',
+  '100% recyclable amber glass vessel.',
+  'Ayurvedic classical formulation. Not for internal consumption.',
+  'STA-KUM-30',
+  '85g',
+  '{"Net Volume":"30ml Glass Dropper Bottle","Key Ingredients":"Kashmiri Kesar, Sandalwood, Manjishta, Sesame Oil","Standard":"Classical Taila Paka Method"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();
+
+INSERT INTO public.products (
+  id, name, tagline, price, original_price, rating, reviews_count, reviews_list,
+  category, image, stock, is_featured, is_new_arrival, description, ingredients,
+  ayurvedic_benefits, how_to_use, suitable_for, net_quantity, shelf_life, storage,
+  packaging_details, sustainability_info, disclaimer, sku, weight, specs
+) VALUES (
+  'neem-tulsi-lepa',
+  'SHRiTEJ Purifying Neem & Tulsi Anti-Blemish Lepa (100g)',
+  'Targeted clarifying herbal clay pack for active acne and oil control',
+  320,
+  450,
+  4.9,
+  5,
+  '[{"id":"r13","author":"Vikas P.","rating":5,"date":"2 weeks ago","comment":"Calmed my breakouts within 3 days without peeling or irritation like chemical face washes.","verified":true}]'::jsonb,
+  'Ubtan & Lepa',
+  'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80',
+  30,
+  false,
+  true,
+  'Formulated with organic Neem leaf powder, Krishna Tulsi, Lodhra, and therapeutic Multani Mitti. Decongests clogged pores, pacifies irritated blemishes, and absorbs excess oil while preserving vital skin hydration.',
+  'Organic Neem (Azadirachta indica), Krishna Tulsi (Ocimum sanctum), Lodhra (Symplocos racemosa), Haridra, Multani Mitti.',
+  '["Soothes active blemishes and Kapha oily congestion","Natural anti-bacterial botanical action without drying alcohols","Tightens pores and clarifies dull oily complexion"]'::jsonb,
+  'Mix 1 teaspoon with SHRiTEJ Rose Water or fresh curd. Apply onto blemish-prone areas or full face. Rinse after 10-12 minutes.',
+  'Oily, acne-prone, and combination skin.',
+  '100g',
+  '24 Months',
+  'Store in dry place.',
+  'Biodegradable unbleached raw kraft stand-up pouch.',
+  'Plastic-free compostable kraft pouch.',
+  'Herbal cosmetic lepa. Patch test recommended.',
+  'STA-NTL-100',
+  '100g',
+  '{"Net Weight":"100g Pouch","Herbs":"Wild Neem, Krishna Tulsi, Lodhra, Multani Mitti","Best For":"Acne & Oil Clarification"}'::jsonb
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  tagline = EXCLUDED.tagline,
+  price = EXCLUDED.price,
+  original_price = EXCLUDED.original_price,
+  rating = EXCLUDED.rating,
+  reviews_count = EXCLUDED.reviews_count,
+  reviews_list = EXCLUDED.reviews_list,
+  category = EXCLUDED.category,
+  image = EXCLUDED.image,
+  stock = EXCLUDED.stock,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  description = EXCLUDED.description,
+  ingredients = EXCLUDED.ingredients,
+  ayurvedic_benefits = EXCLUDED.ayurvedic_benefits,
+  how_to_use = EXCLUDED.how_to_use,
+  suitable_for = EXCLUDED.suitable_for,
+  net_quantity = EXCLUDED.net_quantity,
+  shelf_life = EXCLUDED.shelf_life,
+  storage = EXCLUDED.storage,
+  packaging_details = EXCLUDED.packaging_details,
+  sustainability_info = EXCLUDED.sustainability_info,
+  disclaimer = EXCLUDED.disclaimer,
+  sku = EXCLUDED.sku,
+  weight = EXCLUDED.weight,
+  specs = EXCLUDED.specs,
+  updated_at = NOW();

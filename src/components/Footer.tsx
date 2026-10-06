@@ -1,33 +1,32 @@
 ﻿import React from 'react';
 import { ViewType } from '../types';
-import { Mail, Phone, MessageSquare, Heart, ShieldCheck, Leaf } from 'lucide-react';
+import { Mail, Phone, MessageSquare, ShieldCheck, Heart, Leaf } from 'lucide-react';
+const CONTACT_PHONE = '+91 80802 18728';
+const WHATSAPP_NUMBER = '918080218728';
+const CONTACT_EMAIL = 'care@shritejayurveda.com';
+const INSTAGRAM_HANDLE = 'shritejayurved';
 
 interface FooterProps {
   onNavigate: (view: ViewType, category?: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  const CONTACT_EMAIL = 'care@shritejayurveda.com';
-  const CONTACT_PHONE = '+91 80802 18728';
-  const WHATSAPP_NUMBER = '918080218728';
-  const INSTAGRAM_HANDLE = 'shritejayurved';
-
   const handleLink = (view: ViewType, category?: string) => {
     onNavigate(view, category);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <footer className="border-t border-[#DECDB3] bg-[#F1E9DB] py-14 sm:py-16 text-[#4C4033]">
+    <footer className="bg-[#FAF7F2] border-t border-[#E3DAC8] pt-16 sm:pt-20 pb-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+        {/* Main Footer Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           
           {/* Col 1: Brand & Philosophy */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border border-[#7D5A34]/50 flex items-center justify-center bg-[#2D3E2F] text-[#FAF7F2] shadow-sm shrink-0">
+              <div className="w-10 h-10 rounded-full border border-[#7D5A34] flex items-center justify-center bg-[#2D3E2F] text-[#FAF7F2]">
                 <svg viewBox="0 0 100 100" className="w-6 h-6 fill-current text-[#EBE0CE]">
                   <path
                     d="M50 15 C45 35 30 45 20 50 C30 55 45 65 50 85 C55 65 70 55 80 50 C70 45 55 35 50 15 Z"
@@ -95,8 +94,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <button onClick={() => handleLink('account')} className="text-left hover:text-[#7D5A34] transition-colors">
                 Patron Portal / Orders
               </button>
-              <button onClick={() => handleLink('wishlist')} className="text-left hover:text-[#7D5A34] transition-colors">
-                Sacred Wishlist
+              <button onClick={() => handleLink('track-order')} className="text-left hover:text-[#7D5A34] transition-colors font-semibold">
+                🚚 Track Shipment
+              </button>
+              <button onClick={() => handleLink('admin')} className="text-left hover:text-[#7D5A34] transition-colors font-semibold text-[#7D5A34]">
+                🛡️ Super Admin Portal
               </button>
             </div>
           </div>

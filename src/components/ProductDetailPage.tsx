@@ -27,6 +27,47 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [activeTab, setActiveTab] = useState<'benefits' | 'ingredients' | 'howToUse' | 'sustainability' | 'reviews'>('benefits');
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
 
+  // Review submission state
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [revAuthor, setRevAuthor] = useState('');
+  const [revRating, setRevRating] = useState(5);
+  const [revComment, setRevComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewListState, setReviewListState] = useState(product.reviewsList || []);
+
+  React.useEffect(() => {
+    setReviewListState(product.reviewsList || []);
+  }, [product]);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!revAuthor.trim() || !revComment.trim()) return;
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          author: revAuthor.trim(),
+          rating: revRating,
+          comment: revComment.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (data?.success && data.review) {
+        setReviewListState(prev => [data.review, ...prev]);
+        setRevAuthor('');
+        setRevComment('');
+        setIsReviewFormOpen(false);
+      }
+    } catch (err) {
+      console.warn('Review submission note:', err);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -41,11 +82,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     }
   };
 
-  const reviews = product.reviewsList || [
+  const fallbackReviews = [
     { id: 'r1', author: 'Pooja Kulkarni', rating: 5, date: '2 days ago', comment: 'This authentic Ayurvedic formulation gave my skin an instant radiant golden glow! Pure botanical feel.', verified: true },
     { id: 'r2', author: 'Aniket Deshmukh', rating: 5, date: '5 days ago', comment: 'Gently cleared deep sun tanning within days. The fragrance is pure natural sandalwood and herbs.', verified: true },
     { id: 'r3', author: 'Sneha Patil', rating: 5, date: '1 week ago', comment: 'Truly authentic. Mixed with pure Kannauj Rose Water, it leaves skin glowing without dryness.', verified: true }
   ];
+  const reviews = reviewListState.length > 0 ? reviewListState : fallbackReviews;
 
   return (
     <div className="py-8 sm:py-16 bg-[#FAF7F2] min-h-screen">
@@ -318,12 +360,70 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
             {activeTab === 'reviews' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-[#DECDB3]">
-                  <h3 className="font-brand text-lg font-bold text-[#222E22]">Verified Patron Experiences</h3>
-                  <div className="flex items-center gap-1 text-[#C9A24D] font-bold text-sm font-ui">
-                    <Star className="w-4 h-4 fill-[#C9A24D]" /> {product.rating} average based on verified purchases
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#DECDB3]">
+                  <div>
+                    <h3 className="font-brand text-lg font-bold text-[#222E22]">Verified Patron Experiences</h3>
+                    <div className="flex items-center gap-1 text-[#C9A24D] font-bold text-xs font-ui mt-0.5">
+                      <Star className="w-3.5 h-3.5 fill-[#C9A24D]" /> {product.rating} average based on {reviews.length} experiences
+                    </div>
                   </div>
+                  <button
+                    onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
+                    className="px-4 py-2 rounded-full bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-[11px] uppercase tracking-wider font-semibold transition-all shadow-sm"
+                  >
+                    {isReviewFormOpen ? 'Close Form' : '✍️ Write an Experience'}
+                  </button>
                 </div>
+
+                {isReviewFormOpen && (
+                  <form onSubmit={handleReviewSubmit} className="p-4 sm:p-5 bg-[#F4EDE2] border border-[#DECDB3] rounded-2xl space-y-3 font-ui text-xs">
+                    <h4 className="font-brand font-bold text-sm text-[#222E22]">Share Your Authentic Experience</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">Your Name *</label>
+                        <input
+                          required
+                          type="text"
+                          value={revAuthor}
+                          onChange={(e) => setRevAuthor(e.target.value)}
+                          placeholder="e.g. Pooja Kulkarni"
+                          className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#DECDB3] text-xs focus:outline-none focus:border-[#7D5A34]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">Ayurvedic Rating (1 to 5 Stars)</label>
+                        <select
+                          value={revRating}
+                          onChange={(e) => setRevRating(Number(e.target.value))}
+                          className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#DECDB3] text-xs focus:outline-none focus:border-[#7D5A34] cursor-pointer"
+                        >
+                          <option value={5}>⭐⭐⭐⭐⭐ (5 - Divine formulation)</option>
+                          <option value={4.9}>⭐⭐⭐⭐⭐ (4.9 - Highly recommend)</option>
+                          <option value={4}>⭐⭐⭐⭐ (4 - Very good)</option>
+                          <option value={3}>⭐⭐⭐ (3 - Satisfactory)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-bold text-[#453A2E] mb-1 uppercase tracking-wider text-[10px]">Your Experience / Botanical Review *</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={revComment}
+                        onChange={(e) => setRevComment(e.target.value)}
+                        placeholder="Describe how the formulation felt on your skin..."
+                        className="w-full px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#DECDB3] text-xs focus:outline-none focus:border-[#7D5A34]"
+                      />
+                    </div>
+                    <button
+                      disabled={isSubmittingReview}
+                      type="submit"
+                      className="px-6 py-2.5 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-[11px] uppercase tracking-wider font-bold transition-all shadow-sm disabled:opacity-50"
+                    >
+                      {isSubmittingReview ? 'Submitting to Supabase...' : 'Submit Review'}
+                    </button>
+                  </form>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {reviews.map((rev) => (
                     <div key={rev.id} className="p-4 rounded-2xl bg-[#F5ECE0] border border-[#DECDB3] space-y-2">

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Product, CartItem, Order, ViewType } from '../types';
+import { Product, CartItem, Order, ViewType, UserProfile } from '../types';
 import { INITIAL_PRODUCTS } from '../initialData';
 import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
@@ -26,8 +26,12 @@ import { CartDrawer } from '../components/CartDrawer';
 import { ProductModal } from '../components/ProductModal';
 import { CheckoutModal } from '../components/CheckoutModal';
 import { SearchModal } from '../components/SearchModal';
+import { AdminPortal } from '../components/AdminPortal';
+import { ShipmentTracker } from '../components/ShipmentTracker';
+import { SplashScreen } from '../components/SplashScreen';
+import { AuthModal } from '../components/AuthModal';
 import { Footer } from '../components/Footer';
-import { Check, ArrowRight, Star, ShieldCheck, Mail, Send, ChevronRight } from 'lucide-react';
+import { Check, ArrowRight, Star, ShieldCheck, Mail, Send, ChevronRight, Truck, Sparkles } from 'lucide-react';
 
 export default function ShritejAyurvedaApp() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -35,11 +39,24 @@ export default function ShritejAyurvedaApp() {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   
+  // Auth & User State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Splash Screen State
+  const [showSplash, setShowSplash] = useState(true);
+
+  // Announcement Bar Text
+  const [announcementText, setAnnouncementText] = useState(
+    'ðŸŒ¿ Complimentary Kannauj Rose Mist with all orders above â‚¹999 | Free Plastic-Free Express Shipping Pan-India'
+  );
+
   // View Router State
   const [activeView, setActiveView] = useState<ViewType>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [catalogueInitialCategory, setCatalogueInitialCategory] = useState<string>('All');
   const [catalogueInitialSearch, setCatalogueInitialSearch] = useState<string>('');
+  const [trackedOrderId, setTrackedOrderId] = useState<string | undefined>(undefined);
 
   // Modals & Drawers
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -64,6 +81,10 @@ export default function ShritejAyurvedaApp() {
       if (w) setWishlist(JSON.parse(w));
       const o = localStorage.getItem('shritej_orders');
       if (o) setOrders(JSON.parse(o));
+      const u = localStorage.getItem('shritej_user');
+      if (u) setCurrentUser(JSON.parse(u));
+      const a = localStorage.getItem('shritej_announcement');
+      if (a) setAnnouncementText(a);
     } catch (e) {}
   }, []);
 
@@ -71,14 +92,18 @@ export default function ShritejAyurvedaApp() {
   useEffect(() => { localStorage.setItem('shritej_cart', JSON.stringify(cart)); }, [cart]);
   useEffect(() => { localStorage.setItem('shritej_wishlist', JSON.stringify(wishlist)); }, [wishlist]);
   useEffect(() => { localStorage.setItem('shritej_orders', JSON.stringify(orders)); }, [orders]);
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('shritej_user', JSON.stringify(currentUser));
+    }
+  }, [currentUser]);
+
   // Read ?view= query param if opened directly
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const v = params.get('view') as ViewType | null;
-      if (v) {
-        setActiveView(v);
-      }
+      if (v) setActiveView(v);
     } catch (e) {}
   }, []);
 
@@ -111,6 +136,7 @@ export default function ShritejAyurvedaApp() {
 
   // Cart operations
   const handleAddToCart = (product: Product, qty: number = 1) => {
+    if (product.stock === 0) return;
     setCart((prev) => {
       const exists = prev.find((item) => item.product.id === product.id);
       if (exists) {
@@ -124,6 +150,7 @@ export default function ShritejAyurvedaApp() {
   };
 
   const handleBuyNow = (product: Product, qty: number = 1) => {
+    if (product.stock === 0) return;
     setCart((prev) => {
       const exists = prev.find((item) => item.product.id === product.id);
       if (exists) {
@@ -154,7 +181,6 @@ export default function ShritejAyurvedaApp() {
     setCart((prev) => prev.filter((i) => i.product.id !== id));
   };
 
-  // Wishlist toggle
   const handleToggleWishlist = (id: string) => {
     setWishlist((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -174,10 +200,12 @@ export default function ShritejAyurvedaApp() {
       pincode: string;
     };
     paymentMethod: 'UPI' | 'Card' | 'NetBanking' | 'COD';
+    paymentId?: string;
   }) => {
     const subtotal = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
+    const orderNum = 'ORD-' + Date.now().toString().slice(-6);
     const newOrder: Order = {
-      id: 'SHRITEJ-' + Math.floor(100000 + Math.random() * 900000),
+      id: orderNum,
       date: new Date().toISOString(),
       customerName: orderDetails.name,
       customerEmail: orderDetails.email,
@@ -190,7 +218,9 @@ export default function ShritejAyurvedaApp() {
       status: 'Processing',
       shippingAddress: orderDetails.address,
       paymentMethod: orderDetails.paymentMethod,
-      estimatedDelivery: '3 to 5 business days'
+      estimatedDelivery: '3 to 5 business days',
+      awbNumber: 'STA-' + orderNum.replace(/\D/g, ''),
+      courier: 'Blue Dart Express',
     };
 
     setOrders((prev) => [newOrder, ...prev]);
@@ -199,16 +229,75 @@ export default function ShritejAyurvedaApp() {
     setConfirmedOrder(newOrder);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Sync to Supabase
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrder),
+    }).catch(() => {});
+
     try {
       confetti({ particleCount: 140, spread: 85, origin: { y: 0.6 } });
     } catch (e) {}
   };
 
-  // Newsletter Submit
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  // Admin Operations
+  const handleAddProduct = (newProd: Product) => {
+    setProducts((prev) => [newProd, ...prev]);
+  };
+
+  const handleUpdateProduct = (updated: Product) => {
+    setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    if (selectedProduct && selectedProduct.id === updated.id) {
+      setSelectedProduct(updated);
+    }
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+    if (selectedProduct && selectedProduct.id === id) {
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleUpdateOrderStatus = (
+    orderId: string,
+    newStatus: 'Processing' | 'Packed' | 'Shipped' | 'Delivered',
+    awb?: string,
+    courier?: string
+  ) => {
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            status: newStatus,
+            awbNumber: awb || o.awbNumber,
+            courier: courier || o.courier,
+          };
+        }
+        return o;
+      })
+    );
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('shritej_user');
+      localStorage.removeItem('shritej_admin_auth');
+    } catch (e) {}
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newsletterEmail.includes('@')) {
       setNewsletterSuccess(true);
+      fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      }).catch(() => {});
       setNewsletterEmail('');
       setTimeout(() => setNewsletterSuccess(false), 5000);
     }
@@ -218,6 +307,11 @@ export default function ShritejAyurvedaApp() {
     <div className="min-h-screen bg-[#F8F5EE] text-[#2C2723] flex flex-col justify-between selection:bg-[#C9A24D]/30">
       <div>
         
+        {/* Top Storewide Announcement Banner */}
+        <div className="bg-[#2D3E2F] text-[#FAF7F2] py-2 px-4 text-center font-ui text-[10px] sm:text-[11px] tracking-widest uppercase font-semibold flex items-center justify-center gap-2 border-b border-[#3D523F]">
+          <span>{announcementText}</span>
+        </div>
+
         {/* Sticky Header / Navigation */}
         <Navbar
           cartCount={cart.reduce((s, i) => s + i.quantity, 0)}
@@ -226,6 +320,9 @@ export default function ShritejAyurvedaApp() {
           onNavigate={handleNavigate}
           openCart={() => setIsCartOpen(true)}
           onSearchOpen={() => setIsSearchOpen(true)}
+          currentUser={currentUser}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onLogout={handleLogout}
         />
 
         {/* Order Placed Confirmation Toast / Banner */}
@@ -239,15 +336,26 @@ export default function ShritejAyurvedaApp() {
                 <div>
                   <span className="font-ui text-[10px] uppercase tracking-wider text-[#7D5A34] font-bold">Order Confirmed</span>
                   <h3 className="font-brand font-bold text-xl text-[#222E22]">Thank you for your order!</h3>
-                  <p className="font-ui text-xs text-[#5C4F40]">Order ID: <strong>#{confirmedOrder.id}</strong></p>
+                  <p className="font-ui text-xs text-[#5C4F40]">Consignment ID: <strong>#{confirmedOrder.id}</strong></p>
                 </div>
               </div>
-              <button
-                onClick={() => setConfirmedOrder(null)}
-                className="px-5 py-2 rounded-full border border-[#9A8162] text-xs font-ui uppercase tracking-wider font-semibold hover:bg-[#FAF7F2] self-start sm:self-auto"
-              >
-                Dismiss
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setTrackedOrderId(confirmedOrder.id);
+                    handleNavigate('track-order');
+                  }}
+                  className="px-4 py-2 rounded-full bg-[#2D3E2F] text-white text-xs font-ui uppercase font-semibold flex items-center gap-1.5"
+                >
+                  <Truck className="w-3.5 h-3.5" /> Track Live
+                </button>
+                <button
+                  onClick={() => setConfirmedOrder(null)}
+                  className="px-4 py-2 rounded-full border border-[#9A8162] text-xs font-ui uppercase font-semibold hover:bg-[#FAF7F2]"
+                >
+                  Dismiss
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-ui text-[#4E4032]">
@@ -265,7 +373,7 @@ export default function ShritejAyurvedaApp() {
               <div>
                 <span className="font-bold text-[#222E22] block mb-0.5">Summary:</span>
                 <p>Items: {confirmedOrder.items.length} formulations</p>
-                <p>Total Paid: <strong className="font-brand text-sm text-[#7D5A34]">₹{confirmedOrder.totalAmount}</strong></p>
+                <p>Total Paid: <strong className="font-brand text-sm text-[#7D5A34]">â‚¹{confirmedOrder.totalAmount}</strong></p>
                 <p className="text-[#2D3E2F] font-semibold mt-1">Est. Arrival: {confirmedOrder.estimatedDelivery}</p>
               </div>
             </div>
@@ -275,17 +383,14 @@ export default function ShritejAyurvedaApp() {
         {/* View Router */}
         {activeView === 'home' && (
           <div>
-            {/* Hero Section */}
             <Hero
               onExplore={() => handleNavigate('products')}
               onStory={() => handleNavigate('story')}
               onAyurveda={() => handleNavigate('ayurveda')}
             />
 
-            {/* Featured Formulations Showcase */}
             <section className="py-20 sm:py-28 bg-[#FAF7F2] border-b border-[#E3DAC8]">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-                
                 <div className="text-center space-y-3 max-w-3xl mx-auto">
                   <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
                     Sacred Apothecary
@@ -299,7 +404,6 @@ export default function ShritejAyurvedaApp() {
                   <div className="w-16 h-0.5 bg-[#8E6E45] mx-auto mt-2"></div>
                 </div>
 
-                {/* 3 Featured Products */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {products.slice(0, 3).map((prod) => (
                     <div key={prod.id} className="flex flex-col">
@@ -311,12 +415,21 @@ export default function ShritejAyurvedaApp() {
                         onToggleWishlist={handleToggleWishlist}
                       />
                       <div className="mt-2.5 flex items-center gap-2">
-                        <button
-                          onClick={() => handleBuyNow(prod)}
-                          className="flex-1 py-2 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-bold transition-all shadow-sm text-center"
-                        >
-                          ⚡ Buy Now
-                        </button>
+                        {prod.stock > 0 ? (
+                          <button
+                            onClick={() => handleBuyNow(prod)}
+                            className="flex-1 py-2 rounded-full bg-[#7D5A34] hover:bg-[#684928] text-white font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-bold transition-all shadow-sm text-center"
+                          >
+                            âš¡ Buy Now
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="flex-1 py-2 rounded-full bg-neutral-200 text-neutral-500 font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-center cursor-not-allowed"
+                          >
+                            Sold Out
+                          </button>
+                        )}
                         <button
                           onClick={() => handleOpenProductDetail(prod)}
                           className="px-4 py-2 rounded-full border border-[#B5A187] hover:border-[#7D5A34] text-[#473A2D] font-ui text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold hover:bg-[#FAF7F2] transition-all"
@@ -328,7 +441,6 @@ export default function ShritejAyurvedaApp() {
                   ))}
                 </div>
 
-                {/* All Products CTA */}
                 <div className="text-center pt-4">
                   <button
                     onClick={() => handleNavigate('products')}
@@ -337,17 +449,12 @@ export default function ShritejAyurvedaApp() {
                     Explore Complete Catalogue <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-
               </div>
             </section>
 
-            {/* Why Shritej Ayurved: Brand Pillars */}
             <BrandStory />
-
-            {/* Ayurveda Philosophy Preview */}
             <PhilosophySection />
 
-            {/* Ayurveda Page CTA Section */}
             <section className="py-16 bg-[#F4EDE2] border-b border-[#DECDB3]">
               <div className="max-w-4xl mx-auto px-4 text-center space-y-4">
                 <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
@@ -357,7 +464,7 @@ export default function ShritejAyurvedaApp() {
                   The Living Wisdom of Tridoshas
                 </h3>
                 <p className="font-editorial text-lg text-[#594B3C] max-w-xl mx-auto">
-                  Learn how authentic Ayurveda balances Vata, Pitta, and Kapha energies through mindful daily rituals (Dinacharya).
+                  Learn how authentic Ayurveda balances Vata, Pitta, and Kapha energies through mindful daily rituals.
                 </p>
                 <button
                   onClick={() => handleNavigate('ayurveda')}
@@ -368,154 +475,10 @@ export default function ShritejAyurvedaApp() {
               </div>
             </section>
 
-            {/* Sustainability Packaging Manifesto */}
             <SustainablePackaging />
-
-            {/* Explore Sustainability CTA */}
-            <section className="py-14 bg-[#2D3E2F] text-[#FAF7F2] text-center border-b border-[#1E2B1F]">
-              <div className="max-w-3xl mx-auto px-4 space-y-4">
-                <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#C9A24D] font-bold block">
-                  Earth Stewardship
-                </span>
-                <h3 className="font-brand text-2xl sm:text-3xl font-bold text-white">
-                  Zero Plastic Living. 100% Biodegradable Integrity.
-                </h3>
-                <p className="font-editorial text-base sm:text-lg text-[#E3D9CC] leading-relaxed">
-                  Discover how our stand-up unbleached kraft pouches and handmade cotton wraps protect both your skin and the sacred earth.
-                </p>
-                <button
-                  onClick={() => handleNavigate('sustainability')}
-                  className="mt-2 px-8 py-3.5 rounded-full bg-[#C9A24D] hover:bg-[#B38F3D] text-[#222E22] font-ui text-xs uppercase tracking-[0.2em] font-bold transition-all shadow-md inline-flex items-center gap-2"
-                >
-                  Explore Our Sustainability <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </section>
-
-            {/* Traditional Methods */}
             <TraditionalMethods />
-
-            {/* Authenticity Standards */}
             <AuthenticitySection />
 
-            {/* Customer Reviews Section */}
-            <section className="py-20 sm:py-24 bg-[#FAF7F2] border-b border-[#DECDB3]">
-              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-                <div className="text-center space-y-3 max-w-2xl mx-auto">
-                  <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
-                    Patron Reverence
-                  </span>
-                  <h2 className="font-brand text-3xl sm:text-4xl font-bold text-[#222E22]">
-                    Words from Our Ayurvedic Patrons
-                  </h2>
-                  <p className="font-editorial text-lg text-[#594B3C]">
-                    Honest reflections from those who have embraced authentic Indian snana rituals.
-                  </p>
-                  <div className="w-16 h-0.5 bg-[#8E6E45] mx-auto mt-2"></div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="p-8 bg-[#F4EDE2] rounded-3xl border border-[#DECDB3] space-y-4 shadow-sm flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-1 text-[#C9A24D]">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-[#C9A24D]" />
-                        ))}
-                      </div>
-                      <p className="font-editorial text-base text-[#473B2E] italic leading-relaxed">
-                        &ldquo;The Traditional Ubtan brought back memories of my grandmother&rsquo;s kitchen preparations. You can feel the real sandalwood and pure herbs. My sun tan cleared effortlessly.&rdquo;
-                      </p>
-                    </div>
-                    <div>
-                      <strong className="font-brand text-sm text-[#222E22] block">Pooja Kulkarni</strong>
-                      <span className="font-ui text-[10px] uppercase tracking-wider text-[#7D5A34]">Verified Patron • Pune</span>
-                    </div>
-                  </div>
-
-                  <div className="p-8 bg-[#F4EDE2] rounded-3xl border border-[#DECDB3] space-y-4 shadow-sm flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-1 text-[#C9A24D]">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-[#C9A24D]" />
-                        ))}
-                      </div>
-                      <p className="font-editorial text-base text-[#473B2E] italic leading-relaxed">
-                        &ldquo;The Mysore Sandalwood soap lathered with authentic A2 Cow Ghee is incredible. It leaves skin moisturized without that synthetic slippery chemical feeling.&rdquo;
-                      </p>
-                    </div>
-                    <div>
-                      <strong className="font-brand text-sm text-[#222E22] block">Aditi Nair</strong>
-                      <span className="font-ui text-[10px] uppercase tracking-wider text-[#7D5A34]">Verified Patron • Bengaluru</span>
-                    </div>
-                  </div>
-
-                  <div className="p-8 bg-[#F4EDE2] rounded-3xl border border-[#DECDB3] space-y-4 shadow-sm flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-1 text-[#C9A24D]">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-[#C9A24D]" />
-                        ))}
-                      </div>
-                      <p className="font-editorial text-base text-[#473B2E] italic leading-relaxed">
-                        &ldquo;I ordered the Snana Bath Box. The biodegradable packaging with cotton twine and kraft paper proves their dedication to nature. Truly authentic Indian wellness.&rdquo;
-                      </p>
-                    </div>
-                    <div>
-                      <strong className="font-brand text-sm text-[#222E22] block">Aniket Deshmukh</strong>
-                      <span className="font-ui text-[10px] uppercase tracking-wider text-[#7D5A34]">Verified Patron • Mumbai</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* FAQ Preview Accordion */}
-            <section className="py-20 bg-[#F4EDE2] border-b border-[#DECDB3]">
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-                <div className="text-center space-y-2">
-                  <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
-                    Curious Minds
-                  </span>
-                  <h2 className="font-brand text-3xl sm:text-4xl font-bold text-[#222E22]">
-                    Frequently Answered Inquiries
-                  </h2>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="p-5 bg-[#FAF7F2] rounded-2xl border border-[#DECDB3]">
-                    <h4 className="font-brand text-base font-bold text-[#222E22]">How do I activate the Traditional Ubtan?</h4>
-                    <p className="font-editorial text-base text-[#544537] mt-1.5 leading-relaxed">
-                      Mix 1-2 teaspoons with our pure Kannauj Rose Water or raw organic milk to form a paste. Apply for 12-15 minutes and rinse with cool water.
-                    </p>
-                  </div>
-
-                  <div className="p-5 bg-[#FAF7F2] rounded-2xl border border-[#DECDB3]">
-                    <h4 className="font-brand text-base font-bold text-[#222E22]">Is packaging 100% plastic-free?</h4>
-                    <p className="font-editorial text-base text-[#544537] mt-1.5 leading-relaxed">
-                      Yes. Our bath bars are wrapped in handmade cotton rag paper with jute twine, and our herbal powders come in biodegradable raw kraft pouches.
-                    </p>
-                  </div>
-
-                  <div className="p-5 bg-[#FAF7F2] rounded-2xl border border-[#DECDB3]">
-                    <h4 className="font-brand text-base font-bold text-[#222E22]">What are the shipping charges?</h4>
-                    <p className="font-editorial text-base text-[#544537] mt-1.5 leading-relaxed">
-                      We offer FREE plastic-free express shipping on all orders across India.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-center pt-2">
-                  <button
-                    onClick={() => handleNavigate('faq')}
-                    className="px-6 py-3 rounded-full border border-[#7D5A34] text-[#4E3922] font-ui text-xs uppercase tracking-wider font-bold hover:bg-[#EAE0D0] transition-all inline-flex items-center gap-1.5"
-                  >
-                    View All FAQs &amp; Help Desk <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {/* Newsletter Subscription Form */}
             <section className="py-20 bg-[#FAF7F2] border-b border-[#DECDB3]">
               <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
                 <span className="font-ui text-xs uppercase tracking-[0.3em] text-[#7D5A34] font-bold block">
@@ -525,12 +488,12 @@ export default function ShritejAyurvedaApp() {
                   Join the Ayurvedic Sanctuary
                 </h3>
                 <p className="font-editorial text-lg text-[#594B3C] max-w-xl mx-auto leading-relaxed">
-                  Receive classical Ayurvedic seasonal wisdom (Ritucharya), snana recipes, and early access to micro-batch harvests.
+                  Receive classical Ayurvedic seasonal wisdom and early access to micro-batch harvests.
                 </p>
 
                 {newsletterSuccess ? (
                   <div className="p-4 bg-[#E2EBDD] text-[#2D3E2F] rounded-2xl border border-[#C5D9BE] font-ui text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
-                    <Check className="w-4 h-4" /> Welcome to the SHRiTEJ Sanctuary. Check your inbox soon.
+                    <Check className="w-4 h-4" /> Welcome to the SHRiTEJ Sanctuary.
                   </div>
                 ) : (
                   <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex items-center gap-2">
@@ -555,7 +518,6 @@ export default function ShritejAyurvedaApp() {
                 )}
               </div>
             </section>
-
           </div>
         )}
 
@@ -638,6 +600,41 @@ export default function ShritejAyurvedaApp() {
           <AccountPage
             orders={orders}
             onBrowseCatalogue={() => handleNavigate('products')}
+            onTrackOrder={(id) => {
+              setTrackedOrderId(id);
+              handleNavigate('track-order');
+            }}
+            currentUser={currentUser}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onLogout={handleLogout}
+          />
+        )}
+
+        {/* Dedicated Shipment Tracker View */}
+        {activeView === 'track-order' && (
+          <ShipmentTracker
+            orders={orders}
+            onBrowse={() => handleNavigate('products')}
+            onClose={() => handleNavigate('home')}
+            initialOrderId={trackedOrderId}
+          />
+        )}
+
+        {/* Dedicated Admin Portal View */}
+        {activeView === 'admin' && (
+          <AdminPortal
+            products={products}
+            orders={orders}
+            onAddProduct={handleAddProduct}
+            onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={handleDeleteProduct}
+            onUpdateOrderStatus={handleUpdateOrderStatus}
+            onClose={() => handleNavigate('home')}
+            announcementText={announcementText}
+            onUpdateAnnouncement={(t) => {
+              setAnnouncementText(t);
+              try { localStorage.setItem('shritej_announcement', t); } catch (e) {}
+            }}
           />
         )}
 
@@ -658,6 +655,22 @@ export default function ShritejAyurvedaApp() {
       {/* Global Comprehensive Footer */}
       <Footer onNavigate={handleNavigate} />
 
+      {/* Splash Screen */}
+      {showSplash && (
+        <SplashScreen onFinish={() => setShowSplash(false)} />
+      )}
+
+      {/* Google / Email Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          try { localStorage.setItem('shritej_user', JSON.stringify(user)); } catch (e) {}
+        }}
+        onOpenAdminPortal={() => handleNavigate('admin')}
+      />
+
       {/* Drawers & Modals */}
       <CartDrawer
         isOpen={isCartOpen}
@@ -667,14 +680,6 @@ export default function ShritejAyurvedaApp() {
         onRemoveItem={handleRemoveItem}
         onCheckout={() => setIsCheckoutOpen(true)}
         onBrowseCatalogue={() => handleNavigate('products')}
-      />
-
-      <ProductModal
-        product={quickViewProduct}
-        isOpen={!!quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-        onAddToCart={handleAddToCart}
-        initialTab={quickViewInitialTab}
       />
 
       <CheckoutModal
@@ -688,11 +693,23 @@ export default function ShritejAyurvedaApp() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         products={products}
-        onSelectProduct={handleOpenProductDetail}
-        onViewAllResults={(query) => {
-          setCatalogueInitialSearch(query);
-          setActiveView('products');
+        onSelectProduct={(p) => {
+          setIsSearchOpen(false);
+          handleOpenProductDetail(p);
         }}
+        onViewAllResults={(q) => {
+          setIsSearchOpen(false);
+          setCatalogueInitialSearch(q);
+          handleNavigate('products');
+        }}
+      />
+
+      <ProductModal
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onAddToCart={handleAddToCart}
+        initialTab={quickViewInitialTab}
       />
 
     </div>

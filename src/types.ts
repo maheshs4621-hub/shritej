@@ -1,4 +1,4 @@
-﻿export interface Review {
+export interface Review {
   id: string;
   author: string;
   rating: number;
@@ -63,6 +63,24 @@ export interface Order {
   };
   paymentMethod: 'UPI' | 'Card' | 'NetBanking' | 'COD';
   estimatedDelivery: string;
+  awbNumber?: string;
+  courier?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  avatar?: string;
+  provider: 'google' | 'email';
+  isAdmin?: boolean;
+  addresses?: {
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  }[];
 }
 
 export type ViewType = 
@@ -76,6 +94,8 @@ export type ViewType =
   | 'faq'
   | 'wishlist'
   | 'account'
+  | 'admin'
+  | 'track-order'
   | 'privacy'
   | 'terms'
   | 'shipping-policy'

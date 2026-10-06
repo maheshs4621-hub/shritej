@@ -19,14 +19,22 @@ export const ContactPage: React.FC = () => {
   const BUSINESS_HOURS = 'Monday – Saturday: 9:30 AM – 6:30 PM IST';
   const DISPATCH_SANCTUARY = 'SHRiTEJ Botanical Apothecary, Maharashtra, India';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSending(true);
-    setTimeout(() => {
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+    } catch (err) {
+      console.warn('Contact API sync note:', err);
+    } finally {
       setIsSending(false);
       setIsSubmitted(true);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    }, 1200);
+    }
   };
 
   return (
