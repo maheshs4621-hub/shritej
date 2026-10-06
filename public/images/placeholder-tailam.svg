@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <rect width="100%" height="100%" fill="#F5ECE0"/>
+  <rect x="25" y="25" width="450" height="450" rx="24" fill="none" stroke="#DECDB3" stroke-width="2"/>
+  <rect x="35" y="35" width="430" height="430" rx="16" fill="none" stroke="#C9A24D" stroke-width="1" stroke-dasharray="6,4"/>
+  
+  <!-- Central Emblem -->
+  <circle cx="250" cy="195" r="70" fill="#EFE5D5" stroke="#7D5A34" stroke-width="2"/>
+  
+  <!-- Saffron & Golden Elixir Droplet Icon -->
+  <path d="M250 140 C235 168 220 190 220 210 C220 230 233 245 250 245 C267 245 280 230 280 210 C280 190 265 168 250 140 Z" fill="#C9A24D" opacity="0.95"/>
+  <circle cx="250" cy="215" r="12" fill="#E8B85A" opacity="0.8"/>
+  <path d="M245 155 Q250 170 255 185" stroke="#7D5A34" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Classical Typography -->
+  <text x="250" y="305" text-anchor="middle" font-family="serif" font-size="20" font-weight="bold" fill="#202E22" letter-spacing="3">॥ श्रीतेज आयुर्वेद ॥</text>
+  <text x="250" y="335" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#7D5A34" letter-spacing="2">KUMKUMADI BEAUTY TAILAM (30ML)</text>
+  <text x="250" y="365" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="600" fill="#8A7866" letter-spacing="1.5">AUTHENTIC KASHMIRI SAFFRON ELIXIR</text>
+  <text x="250" y="398" text-anchor="middle" font-family="sans-serif" font-size="10" font-style="italic" fill="#5A4E40">Photo Coming Soon • Pure Herbal Heritage</text>
+</svg>

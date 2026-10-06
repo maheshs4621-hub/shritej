@@ -257,7 +257,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 5.0,
     reviewsCount: 7,
     category: 'Facial Oils',
-    image: 'https://images.unsplash.com/photo-1608248597359-00f73f7c32bf?w=800&auto=format&fit=crop&q=80',
+    image: '/images/placeholder-tailam.svg',
     stock: 0,
     isFeatured: true,
     isNewArrival: false,
