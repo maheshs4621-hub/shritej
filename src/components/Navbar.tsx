@@ -136,6 +136,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Action Icons: Language, Search, User / Auth, Wishlist, Cart */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           
+          {/* Desktop Super Admin Quick Tab */}
+          <button
+            onClick={() => handleNavClick('admin')}
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F4EDE2] hover:bg-[#EFE5D6] text-[#7D5A34] hover:text-[#222E22] border border-[#DECDB3] transition-all font-ui text-xs font-semibold"
+            title={t.adminPortal}
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-[#7D5A34]" />
+            <span>{t.admin}</span>
+          </button>
+
           {/* Desktop Language Switcher */}
           <div className="hidden md:flex items-center rounded-full bg-[#F4EDE2] border border-[#DECDB3] p-0.5 text-xs font-ui font-semibold shadow-xs">
             {LANGUAGES.map((l) => (

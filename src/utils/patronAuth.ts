@@ -17,7 +17,7 @@ const SEED_PATRONS: RegisteredPatron[] = [
     name: 'SHRITEJ Administrator',
     email: 'admin@shritejayurveda.com',
     phone: '9876500000',
-    password: 'adminayurveda',
+    password: 'shritej@2026',
     createdAt: '2026-01-01T00:00:00.000Z',
     isAdmin: true,
   },
@@ -107,7 +107,7 @@ export function registerNewPatron(data: {
     phone: cleanPhone,
     password: data.password,
     createdAt: new Date().toISOString(),
-    isAdmin: cleanEmail.includes('admin'),
+    isAdmin: (cleanEmail === 'admin@shritejayurveda.com' || cleanEmail === 'administrator@shritejayurveda.com' || cleanEmail === 'mahesh@shritejayurveda.com'),
   };
 
   patrons.push(newPatron);

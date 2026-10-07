@@ -30,7 +30,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onUpdateAnnouncement,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [adminEmail, setAdminEmail] = useState('admin@shritejayurveda.com');
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -79,23 +79,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const handleLogin = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (adminPassword === 'shritej@2026' || adminPassword === 'admin123' || adminPassword === 'admin' || !adminPassword) {
+    const cleanEmail = adminEmail.trim().toLowerCase();
+    const cleanPassword = adminPassword.trim();
+
+    const isValidAdminEmail = (
+      cleanEmail === 'admin@shritejayurveda.com' ||
+      cleanEmail === 'administrator@shritejayurveda.com' ||
+      cleanEmail === 'mahesh@shritejayurveda.com'
+    );
+    const isValidAdminPassword = cleanPassword === 'shritej@2026';
+
+    if (isValidAdminEmail && isValidAdminPassword) {
       setIsAuthenticated(true);
       setLoginError('');
       try { localStorage.setItem('shritej_admin_auth', 'true'); } catch (e) {}
     } else {
-      setLoginError('Invalid administrator credentials. Try: shritej@2026');
+      setLoginError('Access Denied: Invalid administrator email or master security password.');
     }
-  };
-
-  const handleQuickUnlock = () => {
-    setAdminPassword('shritej@2026');
-    setIsAuthenticated(true);
-    try { localStorage.setItem('shritej_admin_auth', 'true'); } catch (e) {}
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setAdminEmail('');
+    setAdminPassword('');
+    setLoginError('');
     try { localStorage.removeItem('shritej_admin_auth'); } catch (e) {}
   };
 
@@ -294,6 +301,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 required
                 value={adminEmail}
                 onChange={(e) => setAdminEmail(e.target.value)}
+                placeholder="Enter administrator email"
+                autoComplete="username"
                 className="w-full px-4 py-3 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none"
               />
             </div>
@@ -308,7 +317,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   required
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  placeholder="Enter admin password (shritej@2026)"
+                  placeholder="Enter master security password"
+                  autoComplete="current-password"
                   className="w-full px-4 py-3 rounded-xl bg-[#F4EDE2] border border-[#DECDB3] text-sm text-[#222E22] focus:border-[#7D5A34] focus:outline-none pr-10"
                 />
                 <button
@@ -330,13 +340,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </form>
 
           <div className="pt-2 border-t border-[#DECDB3] text-center space-y-3">
-            <button
-              onClick={handleQuickUnlock}
-              type="button"
-              className="w-full py-2.5 rounded-full bg-[#EFE6D6] hover:bg-[#E5D8C3] text-[#7D5A34] font-ui text-xs uppercase tracking-wider font-bold transition-all border border-[#D5C2A4]"
-            >
-              ⚡ Quick 1-Click Super Admin Unlock
-            </button>
+            
             <button
               onClick={onClose}
               type="button"

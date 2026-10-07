@@ -251,7 +251,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         email: enteredEmail || 'patron@gmail.com',
         phone: phone.trim() ? `+91 ${phone.replace(/\D/g, '').slice(-10)}` : undefined,
         provider: 'google',
-        isAdmin: enteredEmail.toLowerCase().includes('admin'),
+        isAdmin: (enteredEmail.trim().toLowerCase() === 'admin@shritejayurveda.com' || enteredEmail.trim().toLowerCase() === 'administrator@shritejayurveda.com' || enteredEmail.trim().toLowerCase() === 'mahesh@shritejayurveda.com'),
       };
       onLoginSuccess(googleUser);
       onClose();
@@ -272,16 +272,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onClose();
   };
 
-  const handleQuickAdmin = () => {
-    const user: UserProfile = {
-      id: 'patron-admin-01',
-      name: 'SHRITEJ Administrator',
-      email: 'admin@shritejayurveda.com',
-      phone: '+91 98765 00000',
-      provider: 'email',
-      isAdmin: true,
-    };
-    onLoginSuccess(user);
+  const handleOpenAdminConsole = () => {
     onClose();
     if (onOpenAdminPortal) onOpenAdminPortal();
   };
@@ -764,7 +755,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={handleQuickAdmin}
+              onClick={handleOpenAdminConsole}
               className="flex-1 py-2 px-2.5 rounded-xl bg-[#2D3E2F] hover:bg-[#202E22] text-white font-ui text-[10px] font-bold uppercase tracking-wider transition-colors text-center"
             >
               🛡️ Admin Console
