@@ -65,6 +65,10 @@ export interface Order {
   estimatedDelivery: string;
   awbNumber?: string;
   courier?: string;
+  utrNumber?: string;
+  paymentScreenshot?: string;
+  upiId?: string;
+  notes?: string;
 }
 
 export interface UserProfile {

@@ -247,11 +247,28 @@ export const AccountPage: React.FC<AccountPageProps> = ({
                       <div className="text-xs font-ui text-[#6A5A48] pt-2 border-t border-[#DECDB3]/60 flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <span><strong>Destination:</strong> {typeof ord.shippingAddress === 'string' ? ord.shippingAddress : (ord.shippingAddress?.address + ', ' + ord.shippingAddress?.city)}</span>
+                          {ord.utrNumber && (
+                            <span className="block text-[11px] text-[#2D3E2F] font-mono font-semibold mt-0.5">
+                              UPI Settlement UTR: {ord.utrNumber}
+                            </span>
+                          )}
                           {ord.awbNumber && (
                             <span className="block text-[11px] text-[#2D3E2F] font-semibold mt-0.5">
                               Carrier: {ord.courier || 'Blue Dart'} (AWB: {ord.awbNumber})
                             </span>
                           )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`https://wa.me/918080218728?text=${encodeURIComponent(
+                              `Hello, I have placed order ${ord.id} with UTR ${ord.utrNumber || 'verified'}`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3.5 py-2 rounded-full bg-[#25D366] hover:bg-[#20BE5B] text-white font-ui text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs"
+                          >
+                            💬 WhatsApp Support
+                          </a>
                         </div>
                         {onTrackOrder && (
                           <button

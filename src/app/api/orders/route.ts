@@ -1,5 +1,6 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { Order } from '@/types';
+import { getStoredOrders, saveStoredOrder } from '@/lib/ordersStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,8 @@ function mapDbToOrder(row: any): Order {
       : row.shipping_address,
     paymentMethod: row.payment_method || 'UPI',
     estimatedDelivery: row.estimated_delivery || '3-5 business days',
+    utrNumber: row.utr_number,
+    paymentScreenshot: row.payment_screenshot,
   };
 }
 
@@ -29,11 +32,20 @@ export async function GET(req: Request) {
   const email = searchParams.get('email');
   const orderId = searchParams.get('id');
 
+  const localOrders = getStoredOrders().filter((ord) => {
+    const name = (ord.customerName || '').toLowerCase();
+    const em = (ord.customerEmail || '').toLowerCase();
+    if (name.includes('mahesh') || em.includes('mahesh')) return false;
+    if (orderId) return ord.id === orderId;
+    if (email) return em === email.toLowerCase();
+    return true;
+  });
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ success: true, orders: [], source: 'local' });
+    return NextResponse.json({ success: true, orders: localOrders, source: 'local' });
   }
 
   try {
@@ -51,10 +63,10 @@ export async function GET(req: Request) {
 
     const { data, error } = await query;
     if (error) {
-      return NextResponse.json({ success: true, orders: [], error: error.message });
+      return NextResponse.json({ success: true, orders: localOrders, error: error.message });
     }
 
-    const orders = (data || [])
+    const dbOrders = (data || [])
       .filter((r: any) => {
         const name = (r.customer_name || '').toLowerCase();
         const em = (r.customer_email || '').toLowerCase();
@@ -64,9 +76,19 @@ export async function GET(req: Request) {
         return !name.includes('mahesh') && !em.includes('mahesh');
       })
       .map(mapDbToOrder);
-    return NextResponse.json({ success: true, orders, source: 'database' });
+
+    // Merge without duplicates (local orders take precedence for recent UTR data)
+    const combinedMap = new Map<string, Order>();
+    for (const o of dbOrders) combinedMap.set(o.id, o);
+    for (const o of localOrders) combinedMap.set(o.id, o);
+
+    return NextResponse.json({
+      success: true,
+      orders: Array.from(combinedMap.values()),
+      source: 'database-and-local',
+    });
   } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: true, orders: localOrders, fallbackError: err.message });
   }
 }
 
@@ -80,14 +102,37 @@ export async function POST(req: Request) {
       customerPhone,
       items,
       subtotal,
-      discount,
-      shipping,
+      discount = 0,
+      shipping = 0,
       totalAmount,
       status = 'Processing',
       shippingAddress,
       paymentMethod = 'UPI',
       estimatedDelivery = '3 to 5 business days',
+      utrNumber,
+      paymentScreenshot,
     } = body;
+
+    const orderObj: Order = {
+      id: id || ('SHRITEJ-' + Math.floor(100000 + Math.random() * 900000)),
+      date: new Date().toISOString(),
+      customerName,
+      customerEmail,
+      customerPhone,
+      items,
+      subtotal: Number(subtotal) || 0,
+      discount: Number(discount) || 0,
+      shipping: Number(shipping) || 0,
+      totalAmount: Number(totalAmount) || 0,
+      status,
+      shippingAddress,
+      paymentMethod,
+      estimatedDelivery,
+      utrNumber,
+      paymentScreenshot,
+    };
+
+    saveStoredOrder(orderObj);
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -101,15 +146,15 @@ export async function POST(req: Request) {
 
         const { error } = await supabase.from('orders').insert([
           {
-            id: id || ('SHRITEJ-' + Math.floor(100000 + Math.random() * 900000)),
+            id: orderObj.id,
             customer_name: customerName,
             customer_email: customerEmail,
             customer_phone: customerPhone,
             items,
-            subtotal,
-            discount: discount || 0,
-            shipping: shipping || 0,
-            total_amount: totalAmount,
+            subtotal: orderObj.subtotal,
+            discount: orderObj.discount,
+            shipping: orderObj.shipping,
+            total_amount: orderObj.totalAmount,
             status,
             shipping_address: shippingAddress,
             payment_method: paymentMethod,
@@ -119,21 +164,6 @@ export async function POST(req: Request) {
 
         if (!error) {
           dbSaved = true;
-
-          // Deduct stock if possible
-          if (Array.isArray(items)) {
-            for (const itm of items) {
-              if (itm.product?.id && itm.quantity) {
-                try {
-                  const { data: prod } = await supabase.from('products').select('stock').eq('id', itm.product.id).single();
-                  if (prod && typeof prod.stock === 'number') {
-                    const newStock = Math.max(0, prod.stock - itm.quantity);
-                    await supabase.from('products').update({ stock: newStock }).eq('id', itm.product.id);
-                  }
-                } catch (stockErr) {}
-              }
-            }
-          }
         }
       } catch (dbErr) {
         console.warn('Supabase order insert note:', dbErr);
@@ -143,22 +173,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       savedToDb: dbSaved,
-      order: {
-        id,
-        date: new Date().toISOString(),
-        customerName,
-        customerEmail,
-        customerPhone,
-        items,
-        subtotal,
-        discount,
-        shipping,
-        totalAmount,
-        status,
-        shippingAddress,
-        paymentMethod,
-        estimatedDelivery,
-      },
+      order: orderObj,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

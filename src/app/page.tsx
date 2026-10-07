@@ -28,7 +28,7 @@ import { SplashScreen } from '../components/SplashScreen';
 import { AuthModal } from '../components/AuthModal';
 import { Footer } from '../components/Footer';
 import { TRANSLATIONS } from '../lib/translations';
-import { Check, ArrowRight, Star, ShieldCheck, Mail, Send, ChevronRight, Truck, Sparkles } from 'lucide-react';
+import { Check, ArrowRight, Star, ShieldCheck, Mail, Send, ChevronRight, Truck, Sparkles, MessageCircle } from 'lucide-react';
 
 export default function ShritejAyurvedaApp() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -203,57 +203,18 @@ export default function ShritejAyurvedaApp() {
   };
 
   // Order Complete
-  const handleOrderComplete = (orderDetails: {
-    name: string;
-    email: string;
-    phone: string;
-    address: {
-      address: string;
-      apartment?: string;
-      city: string;
-      state: string;
-      pincode: string;
-    };
-    paymentMethod: 'UPI' | 'Card' | 'NetBanking' | 'COD';
-    paymentId?: string;
-  }) => {
-    const subtotal = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
-    const orderNum = 'ORD-' + Date.now().toString().slice(-6);
-    const newOrder: Order = {
-      id: orderNum,
-      date: new Date().toISOString(),
-      customerName: orderDetails.name,
-      customerEmail: orderDetails.email,
-      customerPhone: orderDetails.phone,
-      items: [...cart],
-      subtotal,
-      discount: 0,
-      shipping: 0,
-      totalAmount: subtotal,
-      status: 'Processing',
-      shippingAddress: orderDetails.address,
-      paymentMethod: orderDetails.paymentMethod,
-      estimatedDelivery: '3 to 5 business days',
-      awbNumber: 'STA-' + orderNum.replace(/\D/g, ''),
-      courier: 'Blue Dart Express',
-    };
-
-    setOrders((prev) => [newOrder, ...prev]);
+  const handleOrderComplete = (newOrder: Order) => {
+    setOrders((prev) => [newOrder, ...prev.filter((o) => o.id !== newOrder.id)]);
     setCart([]);
-    setIsCheckoutOpen(false);
     setConfirmedOrder(newOrder);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Sync to Supabase
-    fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder),
-    }).catch(() => {});
-
     try {
-      confetti({ particleCount: 140, spread: 85, origin: { y: 0.6 } });
+      localStorage.setItem('shritej_cart', JSON.stringify([]));
+      const currentStored = localStorage.getItem('shritej_orders');
+      const parsedStored = currentStored ? JSON.parse(currentStored) : [];
+      const updatedStored = [newOrder, ...parsedStored.filter((o: any) => o.id !== newOrder.id)];
+      localStorage.setItem('shritej_orders', JSON.stringify(updatedStored));
     } catch (e) {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Admin Operations
@@ -379,7 +340,17 @@ export default function ShritejAyurvedaApp() {
                   <p className="font-ui text-xs text-[#5C4F40]">Consignment ID: <strong>#{confirmedOrder.id}</strong></p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={`https://wa.me/918080218728?text=${encodeURIComponent(
+                    `Hello, I have placed order ${confirmedOrder.id} with UTR ${confirmedOrder.utrNumber || 'verified'}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#20BE5B] text-white text-xs font-ui uppercase font-bold flex items-center gap-1.5 shadow-xs"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> WhatsApp Desk
+                </a>
                 <button
                   onClick={() => {
                     setTrackedOrderId(confirmedOrder.id);
@@ -679,6 +650,10 @@ export default function ShritejAyurvedaApp() {
         onClose={() => setIsCheckoutOpen(false)}
         cart={cart}
         onComplete={handleOrderComplete}
+        onTrackOrder={(orderId) => {
+          setTrackedOrderId(orderId);
+          handleNavigate('track-order');
+        }}
       />
 
       <SearchModal

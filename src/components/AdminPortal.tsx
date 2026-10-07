@@ -714,6 +714,31 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           ))}
                         </div>
                       </div>
+
+                      {/* Direct UPI Settlement & UTR Verification */}
+                      <div className="p-3.5 bg-[#EFE6D6] rounded-2xl border border-[#DECDB3] flex flex-wrap items-center justify-between gap-3 text-xs font-ui">
+                        <div className="flex flex-wrap items-center gap-2.5">
+                          <span className="font-bold text-[#2D3E2F] uppercase text-[10px] tracking-wider">UPI Settlement:</span>
+                          <span className="font-mono text-[#7D5A34] font-semibold">{ord.upiId || '8888091910@ybl'}</span>
+                          {ord.utrNumber ? (
+                            <span className="px-2.5 py-1 rounded-lg bg-[#2D3E2F] text-white font-mono text-[11px] font-bold">
+                              UTR: {ord.utrNumber}
+                            </span>
+                          ) : (
+                            <span className="text-[#8A7966] italic text-[11px]">No UTR provided</span>
+                          )}
+                        </div>
+                        {ord.paymentScreenshot && (
+                          <a
+                            href={ord.paymentScreenshot}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#7D5A34] hover:text-[#222E22] font-bold text-[11px] underline flex items-center gap-1"
+                          >
+                            <span>🖼️ View Payment Proof</span>
+                          </a>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

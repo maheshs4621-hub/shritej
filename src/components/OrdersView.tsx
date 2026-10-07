@@ -65,10 +65,27 @@ export const OrdersView: React.FC<OrdersViewProps> = ({ orders, onExplore }) => 
                   </div>
                 ))}
               </div>
-              <div className="pt-3 border-t border-[#DECDB3] text-xs text-[#7A6B5B]">
+              <div className="pt-3 border-t border-[#DECDB3] text-xs text-[#7A6B5B] flex flex-wrap items-center justify-between gap-3">
                 <span>
                   Deliver to: <strong className="text-[#222E22]">{order.customerName}</strong> ({typeof order.shippingAddress === 'string' ? order.shippingAddress : `${order.shippingAddress.address}, ${order.shippingAddress.city}`})
                 </span>
+                <div className="flex items-center gap-2">
+                  {order.utrNumber && (
+                    <span className="font-mono text-[11px] bg-[#EFE6D6] px-2.5 py-1 rounded-md text-[#2D3E2F] font-semibold border border-[#DECDB3]">
+                      UTR: {order.utrNumber}
+                    </span>
+                  )}
+                  <a
+                    href={`https://wa.me/918080218728?text=${encodeURIComponent(
+                      `Hello, I have placed order ${order.id} with UTR ${order.utrNumber || 'verified'}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 rounded-full bg-[#25D366] text-white text-[11px] font-bold hover:bg-[#20BE5B] transition-colors"
+                  >
+                    💬 WhatsApp Care Desk
+                  </a>
+                </div>
               </div>
             </div>
           ))}
